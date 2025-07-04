@@ -24,6 +24,9 @@ git clone https://github.com/YewonKimMe/create-spring-app.git my-cool-project
 cd my-cool-project
 ```
 
+또는 create-spring-app 리포지토리 우측 상단 'Use This template' -> create new repository 후,
+자신의 repository 에서 git clone
+
 ---
 
 ### ✅ 1단계. 프로젝트 이름 변경
