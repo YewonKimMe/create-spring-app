@@ -1,4 +1,4 @@
-package com.github.YewonKimMe.create_spring_app.utils;
+package com.github.YewonKimMe.create_spring_app.common.utils;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
