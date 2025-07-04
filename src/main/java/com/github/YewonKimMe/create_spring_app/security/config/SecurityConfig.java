@@ -1,7 +1,12 @@
 package com.github.YewonKimMe.create_spring_app.security.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.YewonKimMe.create_spring_app.security.enums.Role;
 import com.github.YewonKimMe.create_spring_app.security.enums.SecurityConst;
+import com.github.YewonKimMe.create_spring_app.security.filter.JsonUsernamePasswordAuthenticationFilter;
+import com.github.YewonKimMe.create_spring_app.security.filter.JwtValidatorFilter;
+import com.github.YewonKimMe.create_spring_app.security.handler.CustomAuthenticationFailureHandler;
+import com.github.YewonKimMe.create_spring_app.security.handler.CustomAuthenticationSuccessHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -14,7 +19,9 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
 import org.springframework.web.cors.CorsConfiguration;
 
@@ -29,8 +36,8 @@ public class SecurityConfig {
      *  JWT 기반 Spring Security Configuration 입니다.
      *  LOGIN: POST /login, JSON 기반 로그인 요청
      *  Session: STATELESS
-     *
-     *
+     *  JsonUsernamePasswordAuthenticationFilter -> JSON 기반 로그인
+     *  HttpRequest body 에 {@link com.github.YewonKimMe.create_spring_app.security.dto.LoginRequest} 형식 JSON 요청 전송 -> 로그인 처리
      * */
 
     @Value("${spring.security.cors.client.dev-cors-allowed-url}")
@@ -40,8 +47,11 @@ public class SecurityConfig {
     private String PROD_CORS_ALLOWED_URL; // 프로덕션 클라이언트 CORS 허용 URL
 
     private final AuthenticationConfiguration authenticationConfiguration;
+    private final AuthenticationEntryPoint authenticationEntryPoint;
     private final LogoutHandler logoutHandler;
-
+    private final JwtValidatorFilter jwtValidatorFilter;
+    private final CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler;
+    private final CustomAuthenticationFailureHandler customAuthenticationFailureHandler;
 
     // Filter Chain 설정
     @Bean
@@ -59,7 +69,9 @@ public class SecurityConfig {
                         logout
                                 .logoutUrl("/logout")
                                 .addLogoutHandler(logoutHandler)
-                                .logoutSuccessHandler()
+                                .logoutSuccessHandler(((request, response, authentication) -> {
+
+                                }))
                                 .deleteCookies("JSESSIONID", "access_token")
                                 .permitAll()
                 )
@@ -97,9 +109,13 @@ public class SecurityConfig {
                                 .anyRequest().authenticated() // 외의 모든 요청은 인증 필요
                 )
                 .exceptionHandling(
-                        configurer -> configurer.authenticationEntryPoint()
-
-                );
+                        configurer -> configurer.authenticationEntryPoint(authenticationEntryPoint)
+                )
+                // 로그인 및 인증 필터 세팅
+                // jwtValidatorFilter: 로그인 필터 이전에 실행(요청 검증용), 로그인 성공 시 Context 저장
+                // JsonUsernamePasswordAuthenticationFilter: POST /login 에서만 동작, 로그인 필터로 동작
+                .addFilterBefore(jwtValidatorFilter, UsernamePasswordAuthenticationFilter.class) // JWT 검증 필터
+                .addFilterAt(authenticationFilter(), UsernamePasswordAuthenticationFilter.class); // 로그인 필터
 
         return http.build();
     }
@@ -118,5 +134,14 @@ public class SecurityConfig {
     @Bean
     public AuthenticationManager authenticationManager() throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
+    }
+
+    @Bean
+    public JsonUsernamePasswordAuthenticationFilter authenticationFilter() throws Exception {
+        JsonUsernamePasswordAuthenticationFilter filter = new JsonUsernamePasswordAuthenticationFilter(new ObjectMapper());
+        filter.setAuthenticationManager(authenticationManager()); // AuthenticationManager 주입
+        filter.setAuthenticationFailureHandler(customAuthenticationFailureHandler); // failureHandler 주입
+        filter.setAuthenticationSuccessHandler(customAuthenticationSuccessHandler); // successHandler 주입
+        return filter;
     }
 }
