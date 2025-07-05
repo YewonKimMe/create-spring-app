@@ -33,6 +33,8 @@ out/
 /nbdist/
 /.nb-gradle/
 
+.DS_Store
+
 ### VS Code ###
 .vscode/
 
@@ -40,6 +42,10 @@ out/
 application.properties
 application.yml
 /src/main/resources/firebase/
+
+# 환경 변수 파일 무시
+.env
+create-spring-app.env
 
 ### QueryDSL generated QEntity files ###
 /src/main/generated/{your-project-directory}/entity
