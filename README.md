@@ -16,8 +16,7 @@
 내 프로젝트를 `my-cool-project`로 이름, 패키지, 설정을 전부 바꾸는 방법을 안내합니다.
 
 ---
-````markdown
-# my-cool-project
+### my-cool-project
 
 이 프로젝트는 템플릿 저장소 [create-spring-app](https://github.com/YewonKimMe/create-spring-app) 를 기반으로 생성된 Spring Boot 프로젝트입니다.  
 아래 설정을 수정하여 프로젝트에 맞게 설정하세요.
