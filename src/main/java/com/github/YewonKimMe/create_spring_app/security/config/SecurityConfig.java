@@ -3,6 +3,7 @@ package com.github.YewonKimMe.create_spring_app.security.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.YewonKimMe.create_spring_app.security.enums.Role;
 import com.github.YewonKimMe.create_spring_app.security.enums.SecurityConst;
+import com.github.YewonKimMe.create_spring_app.security.exception.entrypoint.AuthenticationEntrypoint;
 import com.github.YewonKimMe.create_spring_app.security.filter.JsonUsernamePasswordAuthenticationFilter;
 import com.github.YewonKimMe.create_spring_app.security.filter.JwtValidatorFilter;
 import com.github.YewonKimMe.create_spring_app.security.handler.CustomAuthenticationFailureHandler;
@@ -19,7 +20,6 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
@@ -47,7 +47,7 @@ public class SecurityConfig {
     private String PROD_CORS_ALLOWED_URL; // 프로덕션 클라이언트 CORS 허용 URL
 
     private final AuthenticationConfiguration authenticationConfiguration;
-    private final AuthenticationEntryPoint authenticationEntryPoint;
+    private final AuthenticationEntrypoint authenticationEntryPoint;
     private final LogoutHandler logoutHandler;
     private final JwtValidatorFilter jwtValidatorFilter;
     private final CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler;
@@ -108,6 +108,7 @@ public class SecurityConfig {
                                 // ...
                                 .anyRequest().authenticated() // 외의 모든 요청은 인증 필요
                 )
+                // 인증-인가 예외 entry-point
                 .exceptionHandling(
                         configurer -> configurer.authenticationEntryPoint(authenticationEntryPoint)
                 )
