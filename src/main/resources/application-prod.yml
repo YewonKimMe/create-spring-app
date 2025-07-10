@@ -52,3 +52,8 @@ server:
   error:
     whitelabel:
       enabled: false
+
+datacenters:
+  id: ${DATACENTER_ID}
+servers:
+  id: ${SERVER_ID}
