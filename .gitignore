@@ -40,7 +40,6 @@ out/
 
 ### Local Setting ###
 application.properties
-application.yml
 /src/main/resources/firebase/
 
 # 환경 변수 파일 무시
