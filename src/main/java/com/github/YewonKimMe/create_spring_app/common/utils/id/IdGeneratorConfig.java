@@ -7,10 +7,10 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class IdGeneratorConfig {
 
-    @Value("${datacenter.id}")
+    @Value("${datacenters.id}")
     private long datacenterId;
 
-    @Value("${server.id}")
+    @Value("${servers.id}")
     private long serverId;
 
     @Bean
