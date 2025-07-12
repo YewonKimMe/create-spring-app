@@ -25,6 +25,8 @@ public interface TokenProvider {
 
     void saveRefreshToken(String redisKey, String refreshToken);
 
+    void deleteRefreshToken(String redisKey);
+
     String getRefreshToken(String redisKey);
 
     TokenValidationResult validateRefreshToken(String refreshToken);

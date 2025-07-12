@@ -167,17 +167,22 @@ public class JwtProvider implements TokenProvider {
 
     @Override
     public String generateRefreshToken(Authentication auth) {
-        return buildToken(auth, TokenType.REFRESH, TokenDurationTime.REFRESH.getTime());
+        return buildToken(auth, TokenType.REFRESH, TokenDurationTime.REFRESH.getHour());
     }
 
     @Override
     public void saveRefreshToken(String redisKey, String refreshToken) {
         try {
             // 기존 토큰 덮어쓰기 + TTL 갱신
-            tokenStore.save(redisKey, refreshToken, TokenDurationTime.REFRESH.getTime(), TimeUnit.HOURS);
+            tokenStore.save(redisKey, refreshToken, TokenDurationTime.REFRESH.getHour(), TimeUnit.HOURS);
         } catch (DataAccessException ex) {
             throw new TokenStorageException("Exception: failed to save token", ex);
         }
+    }
+
+    @Override
+    public void deleteRefreshToken(String redisKey) {
+        tokenStore.remove(redisKey);
     }
 
     @Override
@@ -203,7 +208,7 @@ public class JwtProvider implements TokenProvider {
             throw new IllegalArgumentException("auth나 token은 null 일 수 없습니다.");
         }
 
-        String blackListKey = getBlackListKey(auth, SecurityRedisKey.BLACK_LIST);
+        String blackListKey = getBlackListKey(auth, SecurityTokenKey.BLACK_LIST);
 
         // 남은 시간 계산
         long remainingTime = calcRemainingTime(token);
@@ -231,13 +236,13 @@ public class JwtProvider implements TokenProvider {
 
     @Override
     public void deleteBlackList(Authentication auth, String token) {
-        String blackListKey = this.getBlackListKey(auth, SecurityRedisKey.BLACK_LIST);
+        String blackListKey = this.getBlackListKey(auth, SecurityTokenKey.BLACK_LIST);
 
         tokenStore.remove(blackListKey);
     }
 
     @NotNull
-    private String getBlackListKey(Authentication auth, SecurityRedisKey type) {
-        return SecurityRedisKey.generateKey(auth.getName(), type);
+    private String getBlackListKey(Authentication auth, SecurityTokenKey type) {
+        return SecurityTokenKey.generateKey(auth.getName(), type);
     }
 }
