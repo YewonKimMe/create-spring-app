@@ -18,6 +18,7 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -54,6 +55,7 @@ public class SecurityConfig {
     private final JwtValidatorFilter jwtValidatorFilter;
     private final CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler;
     private final CustomAuthenticationFailureHandler customAuthenticationFailureHandler;
+    private final UserDetailsService userDetailsService;
 
     private Boolean useSession() {
         return authProperties.getUseSession();
@@ -124,6 +126,8 @@ public class SecurityConfig {
                 .exceptionHandling(
                         configurer -> configurer.authenticationEntryPoint(authenticationEntryPoint)
                 )
+                // UserDetailsService
+                .userDetailsService(userDetailsService)
                 // 로그인 및 인증 필터 세팅
                 // jwtValidatorFilter: 로그인 필터 이전에 실행(요청 검증용), 로그인 성공 시 Context 저장
                 // JsonUsernamePasswordAuthenticationFilter: POST /login 에서만 동작, 로그인 필터로 동작
