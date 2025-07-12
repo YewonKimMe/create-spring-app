@@ -19,6 +19,10 @@ spring:
       hibernate:
         format_sql: false # 포맷된 SQL 출력 비활성화
 
+# AES KEY
+aes:
+  aes-key: ${AES_KEY}
+
 # LOGGING LEVEL
 logging:
   level:
