@@ -23,7 +23,7 @@ public class LoginSuccessHandlerConfig {
     @Bean
     public LoginSuccessHandler loginSuccessHandler() {
         if (authProperties.getUseSession()) {
-            return new SessionLoginSuccessHandler(); // TODO 구현
+            return new SessionLoginSuccessHandler();
         }
         return new JwtLoginSuccessHandler(tokenProvider, tokenStore);
     }
