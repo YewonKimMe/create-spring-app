@@ -9,7 +9,9 @@ public enum SecurityConst {
 
     AUTH_HEADER("Authorization"),
 
-    BEARER_PREFIX("Bearer ");
+    BEARER_PREFIX("Bearer "),
+
+    ACCESS_TOKEN_COOKIE_NAME("access_token");
 
     private final String value;
 }
