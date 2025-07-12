@@ -46,6 +46,8 @@ public class SecurityConfig {
     @Value("${spring.security.cors.client.prod-cors-allowed-url}")
     private String PROD_CORS_ALLOWED_URL; // 프로덕션 클라이언트 CORS 허용 URL
 
+    private final AuthProperties authProperties; // 보안 프로퍼티
+
     private final AuthenticationConfiguration authenticationConfiguration;
     private final AuthenticationEntrypoint authenticationEntryPoint;
     private final LogoutHandler logoutHandler;
@@ -53,17 +55,27 @@ public class SecurityConfig {
     private final CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler;
     private final CustomAuthenticationFailureHandler customAuthenticationFailureHandler;
 
+    private Boolean useSession() {
+        return authProperties.getUseSession();
+    }
+
     // Filter Chain 설정
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(AbstractHttpConfigurer::disable) // CSRF 비활성화 (Header 기반 JWT)
+                .csrf(useSession() ? AbstractHttpConfigurer::disable : config -> {}) // CSRF 비활성화 (Header 기반 JWT)
                 .formLogin(AbstractHttpConfigurer::disable) // formLogin 비활성화
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .securityContext(configurer -> configurer
                     .requireExplicitSave(false)) // false: 인증 성공 시 SecurityContext 자동 저장
                 .sessionManagement(
-                        session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                        session -> {
+                            if (useSession()) {
+                                session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED);
+                            } else {
+                                session.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+                            }
+                        }
                 )
                 .logout(logout ->
                         logout
