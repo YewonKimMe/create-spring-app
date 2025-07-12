@@ -16,13 +16,13 @@ public class Authority {
     @Id
     @GeneratedValue(generator = "snowflake")
     @SnowflakeGenerated
-    @Column(name = "ROLE_ID")
+    @Column(name = "role_id")
     private Long id;
 
-    @Column(name = "ROLE_NAME", nullable = false)
+    @Column(name = "role_name", nullable = false)
     private String role;
 
     @ManyToOne
-    @JoinColumn(name = "USER_ID", nullable = false)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 }
