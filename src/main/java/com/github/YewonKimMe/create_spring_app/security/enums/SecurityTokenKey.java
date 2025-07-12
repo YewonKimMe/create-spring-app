@@ -3,7 +3,7 @@ package com.github.YewonKimMe.create_spring_app.security.enums;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public enum SecurityRedisKey {
+public enum SecurityTokenKey {
 
     ACCESS_TOKEN("access_token:"),
     REFRESH_TOKEN("refresh_token:"),
@@ -12,7 +12,7 @@ public enum SecurityRedisKey {
 
     private final String key;
 
-    public static String generateKey(String identifier, SecurityRedisKey type) {
+    public static String generateKey(String identifier, SecurityTokenKey type) {
 
         return type.key + identifier;
     }
