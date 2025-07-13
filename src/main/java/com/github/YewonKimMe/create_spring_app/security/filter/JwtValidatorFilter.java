@@ -46,8 +46,7 @@ public class JwtValidatorFilter extends OncePerRequestFilter {
         String token = tokenProvider.resolveToken(request);
 
         if (token == null || token.isBlank()) {
-            SecurityContextHolder.clearContext();
-            filterChain.doFilter(request, response);
+            cleanContextAndContinue(request, response, filterChain);
             return;
         }
 
@@ -70,8 +69,7 @@ public class JwtValidatorFilter extends OncePerRequestFilter {
                 String refreshToken = tokenProvider.getRefreshToken(redisKey);
 
                 if (refreshToken == null || refreshToken.isBlank()) {
-                    SecurityContextHolder.clearContext();
-                    filterChain.doFilter(request, response);
+                    cleanContextAndContinue(request, response, filterChain);
                     return;
                 }
 
@@ -89,17 +87,22 @@ public class JwtValidatorFilter extends OncePerRequestFilter {
 
                     SecurityContextHolder.getContext().setAuthentication(authentication);
                 } else {
-                    SecurityContextHolder.clearContext();
+                    cleanContextAndContinue(request, response, filterChain);
+                    return;
                 }
                 filterChain.doFilter(request, response);
                 return;
             }
             default: {
-                SecurityContextHolder.clearContext();
-                filterChain.doFilter(request, response);
+                cleanContextAndContinue(request, response, filterChain);
                 return;
             }
         }
+    }
+
+    private void cleanContextAndContinue(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        SecurityContextHolder.clearContext();
+        filterChain.doFilter(request, response);
     }
 
     @Override
