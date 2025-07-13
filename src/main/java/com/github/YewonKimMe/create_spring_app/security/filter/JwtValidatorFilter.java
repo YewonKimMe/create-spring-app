@@ -95,7 +95,6 @@ public class JwtValidatorFilter extends OncePerRequestFilter {
             }
             default: {
                 cleanContextAndContinue(request, response, filterChain);
-                return;
             }
         }
     }
