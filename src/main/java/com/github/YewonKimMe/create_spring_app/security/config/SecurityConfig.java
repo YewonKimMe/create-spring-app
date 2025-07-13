@@ -65,7 +65,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(useSession() ? AbstractHttpConfigurer::disable : config -> {}) // CSRF 비활성화 (Header 기반 JWT)
+                .csrf(useSession() ? config -> {} : AbstractHttpConfigurer::disable) // CSRF 비활성화 (Header 기반 JWT)
                 .formLogin(AbstractHttpConfigurer::disable) // formLogin 비활성화
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .securityContext(configurer -> configurer
