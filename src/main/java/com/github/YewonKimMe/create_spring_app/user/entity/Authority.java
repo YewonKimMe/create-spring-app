@@ -10,7 +10,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(name = "USER_ROLE")
+@Table(name = "USERS_ROLE")
 public class Authority {
 
     @Id
