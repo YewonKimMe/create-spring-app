@@ -117,7 +117,7 @@ public class SecurityConfig {
                                 .requestMatchers("/api/v1/sign-up").permitAll()
                                 // 역할 기반 인가 예시
                                 .requestMatchers("/api/v1/admin/**").hasRole(Role.ADMIN.getRole())
-                                .requestMatchers("/api/v1/member/**").hasRole(Role.MEMBER.getRole())
+                                .requestMatchers("/api/v1/user/**").hasRole(Role.USER.getRole())
 
                                 // ...
                                 .anyRequest().authenticated() // 외의 모든 요청은 인증 필요

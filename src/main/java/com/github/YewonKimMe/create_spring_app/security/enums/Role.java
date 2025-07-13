@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 public enum Role {
 
     PREFIX("ROLE_"),
-    MEMBER("MEMBER"),   // 일반 회원
+    USER("USER"),   // 일반 회원
     ADMIN("ADMIN"),     // 관리자
     GUEST("GUEST");     // 비회원/게스트
 
