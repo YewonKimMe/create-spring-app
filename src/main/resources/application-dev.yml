@@ -1,27 +1,30 @@
+# 로컬 개발 테스트용 yml
+# 로컬 머신 데이터베이스 접속 용도
+
 spring:
   application:
     name: ${PROJECT_NAME}
   docker:
     compose:
-      file: compose.yaml
+      file: compose-dev.yaml
   jackson:
     time-zone: Asia/Seoul
   # DATASOURCE SETTING
   datasource:
-    url: ${DB_URL}
+    url: jdbc:mysql://localhost:3306/create-spring-app?useSSL=false&useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Seoul&allowPublicKeyRetrieval=true&rewriteBatchedStatements=true
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
   # REDIS SETTING
   data:
     redis:
-      host: ${REDIS_HOST}
+      host: localhost
       port: 6379
   jpa:
-    show-sql: false # SQL 쿼리 출력 비활성화
+    show-sql: true
     properties:
       hibernate:
-        format_sql: false # 포맷된 SQL 출력 비활성화
+        format_sql: true
 
 # AES KEY
 aes:
@@ -30,9 +33,9 @@ aes:
 # LOGGING LEVEL
 logging:
   level:
-    site: ${LOG_LEVEL}
-    org.springframework.data.redis: ${REDIS_LOG_LEVEL}
-    io.lettuce.core: ${REDIS_LETTUCE_LOG_LEVEL}
+    site: debug
+    org.springframework.data.redis: info
+    io.lettuce.core: info
 
 # FIREBASE SETTING
 firebase:
