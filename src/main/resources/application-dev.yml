@@ -25,6 +25,16 @@ spring:
     properties:
       hibernate:
         format_sql: true
+  # SECURITY SETTING
+  security:
+    cors:
+      client:
+        dev-cors-allowed-url: ${DEV_CORS_ALLOWED_URL} # 클라이언트 개발 서버 허용 URL
+        prod-cors-allowed-url: ${PROD_CORS_ALLOWED_URL} # 프로덕션 개발 서버 허용 URL
+    auth:
+      use-session: ${USE_SESSION}
+      jwt:
+        secret: ${JWT_SECRET} # JWT SECRET
 
 # AES KEY
 aes:
