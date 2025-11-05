@@ -1,12 +1,33 @@
 # 🌱 create-spring-app
 
-> Spring Boot 기반 사이드 프로젝트를 빠르게 시작할 수 있도록 구성된 보일러플레이트 프로젝트입니다.
-> 
-> 웹, REST API, Redis, Security 등 다양한 기능이 기본으로 통합되어 있습니다.
-> 
-> 토큰 기반 인증으로 웹 클라이언트, 앱 클라이언트 상호 호환을 지원합니다.
-> 
-> 템플릿 리포지토리 기반으로 리포지토리를 생성 후, 다음 단계를 따라서 자신만의 리포지토리로 변경하세요.
+### SpringBoot 기반 사이드 프로젝트용 시작 템플릿
+> 사이드 프로젝트 시 스프링부트 기반으로 빠르게 개발 환경을 셋팅 할 수 있는 템플릿입니다.
+
+## feature
+
+- **Spring Security**
+  - **인증 (Authentication)**
+    - **JWT / 세션 기반 인증**: `application-dev.yml`, `application-prod.yml` 파일의 `auth.use-session` boolean 설정을 통해 JWT 방식과 세션 방식 중 선택하여 사용할 수 있습니다.
+    - **JSON 기반 로그인**: `JsonUsernamePasswordAuthenticationFilter`를 통해 Form Data가 아닌 JSON 형식의 Request Body로 로그인을 처리합니다.
+      - 로그인 요청 엔드포인트: `/login`
+      - 계정 등록 엔드포인트는 구현이 필요합니다. `SecurityConfig`에는 `/api/v1/sign-up`으로 설정되어 있습니다.
+    - **Redis 토큰 관리**: JWT 사용 시, Refresh Token을 Redis에 저장하여 관리합니다.
+    - **커스텀 핸들러**: 인증 성공/실패, 로그아웃 등 다양한 시나리오에 대한 커스텀 핸들러를 구현했습니다.
+    - **User**: 기본적인 `User` 클래스 및 `Authority` 클래스가 정의되어 있습니다.
+      - 인증 과정에서 `SecurityUserDetails`는 위 `User` 를 사용합니다.
+
+- **데이터베이스 (Database)**
+  - **QueryDSL 지원**: `QueryDslConfig`를 통해 QueryDSL을 프로젝트에 통합하여 타입-세이프(type-safe)한 동적 쿼리 작성이 가능합니다.
+  - **Snowflake ID 생성**: Snowflake 알고리즘을 사용, 유니크하고 정렬 가능한 ID를 생성합니다. 엔티티의 ID에 `@SnowflakeGenerated` 어노테이션을 사용하여 적용할 수 있습니다.
+
+- **유틸리티 (Utilities)**
+  - **XSS 방지**: `XssSanitizer`를 통해 Cross-Site Scripting 공격을 방지합니다.
+  - **AES 암호화**: `AESUtil`을 통해 데이터를 대칭키 방식으로 암호화하고 복호화할 수 있습니다.
+  - **쿠키 관리**: `CookieUtils`를 통해 쿠키를 손쉽게 생성, 조회, 삭제할 수 있습니다.
+
+- **개발 환경 (Development Environment)**
+  - **프로필 기반 설정**: `dev`, `prod` 등 환경에 따라 설정을 분리하여 관리합니다. (`application-dev.yml`, `application-prod.yml`)
+  - **Docker Compose 지원**: `compose-dev.yaml` 파일을 통해 `mysql`, `redis` 등 개발에 필요한 의존성들을 컨테이너로 한번에 실행할 수 있습니다.
 
 ---
 
@@ -16,108 +37,153 @@
 내 프로젝트를 `my-cool-project`로 이름, 패키지, 설정을 전부 바꾸는 방법을 안내합니다.
 
 ---
-### my-cool-project
 
-이 프로젝트는 템플릿 저장소 [create-spring-app](https://github.com/YewonKimMe/create-spring-app) 를 기반으로 생성된 Spring Boot 프로젝트입니다.  
-아래 설정을 수정하여 프로젝트에 맞게 설정하세요.
+### ✅ 0단계. 준비
+
+GitHub 템플릿에서 내 프로젝트 생성:
+
+```bash
+git clone https://github.com/YewonKimMe/create-spring-app.git my-cool-project
+cd my-cool-project
+```
+
+또는 create-spring-app 리포지토리 우측 상단 'Use This template' -> create new repository 후,
+자신의 repository 에서 git clone
 
 ---
 
-## 프로젝트 설정 변경
+### ✅ 1단계. 프로젝트 이름 변경
 
-### 1. settings.gradle
+`settings.gradle` 열고, 아래 줄을 수정하세요:
 
 ```groovy
 rootProject.name = 'my-cool-project'
-````
+```
 
 ---
 
-### 2. build.gradle 그룹명 변경
+### ✅ 2단계. 그룹명 변경
+
+`build.gradle` 파일에서 이 부분을 수정하세요:
 
 ```groovy
-group = 'your.group.name'
+group = 'com.myname'
 ```
-프로젝트에 맞는 적절한 그룹명을 설정해주세요.
+
+원하는 그룹명 (도메인 기반 네이밍)을 넣으세요. 예: `dev.yewon`, `io.github.junho`
 
 ---
 
-### 3. 패키지 구조 변경
+### ✅ 3단계. 패키지 경로 바꾸기
 
-`src/main/java` 및 `src/test/java` 경로 내의 패키지를 다음과 같이 변경하세요.
-
-* 변경 전: `com.github.YewonKimMe.create-spring-app`
-* 변경 후: `com.github.your_name.my-cool-project`
-  * 위 com.github.your_name.my-cool-project 는 자유롭게 변경하세요.
-
-IntelliJ에서 디렉토리 우클릭 → Refactor → Rename 또는 Move 사용 시 안전하게 변경 가능
-
----
-
-### 4. 테스트 코드 패키지명 변경
+현재 패키지 경로는 다음과 같을 수 있습니다:
 
 ```
+src/main/java/com/github/YewonKimMe/create_spring_app
+```
+
+이 경로를 다음과 같이 바꿔주세요:
+
+```
+src/main/java/com/myname/mycoolproject
+```
+
+> IntelliJ에서: 해당 폴더 우클릭 → `Refactor` → `Rename` & `Move` 순서대로 사용하면 안전하게 변경됩니다.
+
+변경 후에는 `.java` 파일 상단의 `package` 선언도 이렇게 바뀌어야 합니다:
+
+```java
 // 변경 전
 package com.github.YewonKimMe.create_spring_app;
 
 // 변경 후
-package com.github.your_name.my_cool_project;
-
-위 com.github.your_name.my_cool_project 는 메인 패키지명과 동일하게 변경하세요.
+package com.myname.mycoolproject;
 ```
 
 ---
 
-### 5. README.md 수정
+### ✅ 4단계. 테스트 코드 경로도 동일하게 변경
 
-프로젝트 목적에 맞게 문서를 수정하세요.
+```
+src/test/java/com/github/YewonKimMe/create_spring_app
+→
+src/test/java/com/myname/mycoolproject
+```
+
+테스트 클래스 내부의 `package` 선언도 꼭 함께 변경해주세요.
 
 ---
 
-### 6. Git 원격 주소 변경 (선택)
+### ✅ 5단계. 애플리케이션 이름 변경
+
+`src/main/resources/application.yml` 파일 열고, 아래 항목을 수정하세요:
+
+```yaml
+spring:
+  application:
+    name: my-cool-project
+```
+
+---
+
+### ✅ 6단계. README 수정
+
+`README.md` 파일을 열고, 다음 내용을 내 프로젝트에 맞게 바꾸세요:
+
+* 프로젝트 이름 (`create-spring-app` → `my-cool-project`)
+* 설명, 기술스택, 실행 방법 등 필요에 따라 업데이트
+
+---
+
+### ✅ 7단계. Git 원격 저장소 연결
+
+새로운 GitHub 저장소를 만든 후, 기존 원격을 바꾸세요:
 
 ```bash
-git remote set-url origin git@github.com:<your-username>/my-cool-project.git
+git remote set-url origin https://github.com/your-username/my-cool-project.git
 ```
 
----
+최초 푸시:
 
-## 체크리스트
-
-* [ ] settings.gradle의 프로젝트 이름 수정
-* [ ] build.gradle의 group 수정
-* [ ] 패키지 구조 및 테스트 코드 패키지 수정
-* [ ] README.md 수정
-* [ ] git remote 주소 확인
-
+```bash
+git add .
+git commit -m "chore: initialize my-cool-project from spring template"
+git push -u origin main
 ```
-Hello World!
-```
-
 
 ---
 
 ## 🎉 이제 내 프로젝트로 완전히 리네이밍이 완료되었습니다. 바로 개발을 시작하세요! 🚀
 
 ---
+
+
+# docker-compose 기반 배포
+
+gradlew build, 컨테이너 실행 환경 구성
+
+1. 인스턴스에 프로젝트 가져오기: `git clone your-project-name`
+2. JAR 파일 만들기: 프로젝트 root 디렉토리에서, `./gradlew clean build
+`
+3. root 디렉토리에 `create-spring-app.env` 파일 생성 (또는 첨부된 create-spring-app-example.env 파일 제목 변경 후 내용 작성)
+4. 프로젝트 루트 디렉토리에서 `docker compose up -d --build` 명령 실행 
+    - (Dockerfile이 JAR 배포파일을 docker image 안으로 복사)
+
+> docker-compose 기반 배포 시 root 디렉토리에 `create-spring-app.env` 파일 추가가 필요합니다.
+> <br>create-spring-app-example.env 를 참고하세요.
+
+---
 ## 📦 주요 기술 스택
 
-| 영역              | 사용 기술                             |
-|-----------------|-----------------------------------|
-| Language        | Java 17 (Toolchain 적용)            |
-| Build Tool      | Gradle 8.x                        |
-| Framework       | Spring Boot 3.5.3                 |
-| ORM             | Spring Data JPA, QueryDSL         |
-| DB              | MySQL(with DDL_security entities) |
-| Cache           | Redis                             |
-| Template Engine | Thymeleaf                         |
-| API 문서          | SpringDoc OpenAPI (Swagger)       |
-| 보안/인증           | Spring Security + JWT             |
-| 이메일 발송          | Spring Mail                       |
-| HTML 파싱         | Jsoup                             |
-| 테스트             | JUnit 5, Spring Security Test     |
-| 기타              | Slack API 연동, Firebase Admin SDK  |
-
+| 영역         | 사용 기술                     |
+|------------|---------------------------|
+| Language   | Java 17 (Toolchain 적용)    |
+| Build Tool | Gradle 8.x                |
+| Framework  | Spring Boot 3.5.3         |
+| ORM        | Spring Data JPA, QueryDSL |
+| DB         | MySQL                     |
+| Cache      | Redis                     |
+| Security   | Spring Security           |
 ---
 
 ## 🛠️ 기본 구성
@@ -130,5 +196,7 @@ Hello World!
 │   ├── application.yml
 ├──Dockerfile
 ├── docker-compose.yml              # (Docker Compose 사용 시)
+├── compose-dev.yml   # 개발용 도커 설정
+├── create-spring-app.env # 환경변수 파일, 직접 생성 또는 create-spring-app-example.env 파일명 변경 후 value 추가 필요  
 ├── build.gradle
 └── README.md

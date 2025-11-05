@@ -3,11 +3,11 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: container-name
+    container_name: create-spring-app
     ports:
       - "8080:8080"
     env_file:
-      - env-file-name
+      - create-spring-app.env # 최상위 디렉토리에 생성해 주세요.
     depends_on:
       - redis
     environment:
