@@ -7,4 +7,4 @@ spring:
   config:
     import: optional:file:create-spring-app.env[.properties]
   profiles:
-    active: dev # 배포 시 prod 로 변경
+    active: ${SPRING_PROFILES_ACTIVE} # 배포 시  env 파일에서 prod 로 변경
