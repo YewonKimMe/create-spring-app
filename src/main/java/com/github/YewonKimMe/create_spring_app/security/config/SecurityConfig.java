@@ -8,6 +8,7 @@ import com.github.YewonKimMe.create_spring_app.security.filter.JsonUsernamePassw
 import com.github.YewonKimMe.create_spring_app.security.filter.JwtValidatorFilter;
 import com.github.YewonKimMe.create_spring_app.security.handler.CustomAuthenticationFailureHandler;
 import com.github.YewonKimMe.create_spring_app.security.handler.CustomAuthenticationSuccessHandler;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -84,7 +85,8 @@ public class SecurityConfig {
                                 .logoutUrl("/logout")
                                 .addLogoutHandler(logoutHandler)
                                 .logoutSuccessHandler(((request, response, authentication) -> {
-
+                                    // 로그아웃 성공 후 처리
+                                    response.setStatus(HttpServletResponse.SC_OK);
                                 }))
                                 .deleteCookies("JSESSIONID", "access_token")
                                 .permitAll()
