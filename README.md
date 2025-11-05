@@ -1,10 +1,33 @@
 # 🌱 create-spring-app
 
-> Spring Boot 기반 사이드 프로젝트를 빠르게 시작할 수 있도록 구성된 보일러플레이트입니다.  
-> 웹, REST API, Kafka, Redis, Security 등 다양한 기능이 기본으로 통합되어 있습니다.
-> 웹 클라이언트, 앱 클라이언트 상호 호환을 지원하도록 만들었습니다.
-> 
-> 템플릿 리포지토리 기반으로 리포지토리를 생성후, 다음 단계를 따라서 자신만의 리포지토리로 변경하면 됩니다.
+### SpringBoot 기반 사이드 프로젝트용 시작 템플릿
+> 사이드 프로젝트 시 스프링부트 기반으로 빠르게 개발 환경을 셋팅 할 수 있는 템플릿입니다.
+
+## feature
+
+- **Spring Security**
+  - **인증 (Authentication)**
+    - **JWT / 세션 기반 인증**: `application-dev.yml`, `application-prod.yml` 파일의 `auth.use-session` boolean 설정을 통해 JWT 방식과 세션 방식 중 선택하여 사용할 수 있습니다.
+    - **JSON 기반 로그인**: `JsonUsernamePasswordAuthenticationFilter`를 통해 Form Data가 아닌 JSON 형식의 Request Body로 로그인을 처리합니다.
+      - 로그인 요청 엔드포인트: `/login`
+      - 계정 등록 엔드포인트는 구현이 필요합니다. `SecurityConfig`에는 `/api/v1/sign-up`으로 설정되어 있습니다.
+    - **Redis 토큰 관리**: JWT 사용 시, Refresh Token을 Redis에 저장하여 관리합니다.
+    - **커스텀 핸들러**: 인증 성공/실패, 로그아웃 등 다양한 시나리오에 대한 커스텀 핸들러를 구현했습니다.
+    - **User**: 기본적인 `User` 클래스 및 `Authority` 클래스가 정의되어 있습니다.
+      - 인증 과정에서 `SecurityUserDetails`는 위 `User` 를 사용합니다.
+
+- **데이터베이스 (Database)**
+  - **QueryDSL 지원**: `QueryDslConfig`를 통해 QueryDSL을 프로젝트에 통합하여 타입-세이프(type-safe)한 동적 쿼리 작성이 가능합니다.
+  - **Snowflake ID 생성**: Snowflake 알고리즘을 사용, 유니크하고 정렬 가능한 ID를 생성합니다. 엔티티의 ID에 `@SnowflakeGenerated` 어노테이션을 사용하여 적용할 수 있습니다.
+
+- **유틸리티 (Utilities)**
+  - **XSS 방지**: `XssSanitizer`를 통해 Cross-Site Scripting 공격을 방지합니다.
+  - **AES 암호화**: `AESUtil`을 통해 데이터를 대칭키 방식으로 암호화하고 복호화할 수 있습니다.
+  - **쿠키 관리**: `CookieUtils`를 통해 쿠키를 손쉽게 생성, 조회, 삭제할 수 있습니다.
+
+- **개발 환경 (Development Environment)**
+  - **프로필 기반 설정**: `dev`, `prod` 등 환경에 따라 설정을 분리하여 관리합니다. (`application-dev.yml`, `application-prod.yml`)
+  - **Docker Compose 지원**: `compose-dev.yaml` 파일을 통해 `mysql`, `redis` 등 개발에 필요한 의존성들을 컨테이너로 한번에 실행할 수 있습니다.
 
 ---
 
@@ -133,25 +156,34 @@ git push -u origin main
 ## 🎉 이제 내 프로젝트로 완전히 리네이밍이 완료되었습니다. 바로 개발을 시작하세요! 🚀
 
 ---
+
+
+# docker-compose 기반 배포
+
+gradlew build, 컨테이너 실행 환경 구성
+
+1. 인스턴스에 프로젝트 가져오기: `git clone your-project-name`
+2. JAR 파일 만들기: 프로젝트 root 디렉토리에서, `./gradlew clean build
+`
+3. root 디렉토리에 `create-spring-app.env` 파일 생성 (또는 첨부된 create-spring-app-example.env 파일 제목 변경 후 내용 작성)
+4. 프로젝트 루트 디렉토리에서 `docker compose up -d --build` 명령 실행 
+    - (Dockerfile이 JAR 배포파일을 docker image 안으로 복사)
+
+> docker-compose 기반 배포 시 root 디렉토리에 `create-spring-app.env` 파일 추가가 필요합니다.
+> <br>create-spring-app-example.env 를 참고하세요.
+
+---
 ## 📦 주요 기술 스택
 
-| 영역             | 사용 기술 |
-|------------------|-----------|
-| Language         | Java 17 (Toolchain 적용) |
-| Build Tool       | Gradle 8.x |
-| Framework        | Spring Boot 3.5.3 |
-| ORM              | Spring Data JPA, QueryDSL |
-| DB               | MySQL |
-| Cache            | Redis |
-| Messaging        | Apache Kafka |
-| View             | Thymeleaf + Spring Security |
-| API 문서         | SpringDoc OpenAPI (Swagger) |
-| 인증             | Spring Security + JWT |
-| 이메일 발송      | Spring Mail |
-| HTML 파싱        | Jsoup |
-| 테스트           | JUnit 5, Spring Security Test, Kafka Test |
-| 기타             | Slack API 연동, Firebase Admin SDK |
-
+| 영역         | 사용 기술                     |
+|------------|---------------------------|
+| Language   | Java 17 (Toolchain 적용)    |
+| Build Tool | Gradle 8.x                |
+| Framework  | Spring Boot 3.5.3         |
+| ORM        | Spring Data JPA, QueryDSL |
+| DB         | MySQL                     |
+| Cache      | Redis                     |
+| Security   | Spring Security           |
 ---
 
 ## 🛠️ 기본 구성
@@ -164,5 +196,7 @@ git push -u origin main
 │   ├── application.yml
 ├──Dockerfile
 ├── docker-compose.yml              # (Docker Compose 사용 시)
+├── compose-dev.yml   # 개발용 도커 설정
+├── create-spring-app.env # 환경변수 파일, 직접 생성 또는 create-spring-app-example.env 파일명 변경 후 value 추가 필요  
 ├── build.gradle
 └── README.md
