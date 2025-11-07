@@ -183,7 +183,7 @@ src/main/resources/script/users-and-users-role-schema.sql 을 데이터베이스
 
 1. 로컬, 혹은 배포용 인스턴스에서 외부 RDB 서비스나 인스턴스(로컬) MySQL 등을 사용하는 경우(배포 기본)
    1. 환경변수 파일 `create-spring-app-example.env`의 `DB_URL=jdbc:mysql://localhost:3306/{DB_PROJECT_NAME}?useSSL=false&useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Seoul&allowPublicKeyRetrieval=true&rewriteBatchedStatements=true` 로 로컬 MySQL 설정, 혹은 외부 RDB 서비스 엔드포인트 입력
-   2. compose-dev.yaml 의 `mysql:` 이하를 전부 주석 처리
+   2. compose-dev.yaml(개발), compose.yaml(배포) 의 `mysql:` 이하를 전부 주석 처리
    3. `create-spring-app` 데이터베이스를 MySQL 내에 생성
    4. MySQL 접속 후 `src/main/resources/script/users-and-users-role-schema.sql` 을 복사 후 실행(시큐리티용 테이블 생성)
 
