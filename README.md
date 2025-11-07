@@ -178,8 +178,8 @@ src/main/resources/script/users-and-users-role-schema.sql 을 데이터베이스
 # 데이터베이스 설정
 사용 환경에 따라 아래 단계를 따라하면 됩니다.
 
-<b>로컬 개발: 로컬 스프링부트 + MySQL 컨테이너 + Redis 컨테이너 를 기준으로 합니다. 로컬(Intellij)에서 처음 스프링부트 실행 시 2번으로 실행됩니다.<b>
-배포: Docker Compose + 외부 RDB 서비스 or MySQL 컨테이너를 기준으로 합니다.
+- <b>로컬 개발: 로컬 스프링부트 + MySQL 컨테이너 + Redis 컨테이너 를 기준으로 합니다. 로컬(Intellij)에서 처음 스프링부트 실행 시 2번으로 실행됩니다.<b>
+- 배포: Docker Compose + 외부 RDB 서비스 or MySQL 컨테이너를 기준으로 합니다.
 
 1. 로컬, 혹은 배포용 인스턴스에서 외부 RDB 서비스나 인스턴스(로컬) MySQL 등을 사용하는 경우(배포 기본)
    1. 환경변수 파일 `create-spring-app-example.env`의 `DB_URL=jdbc:mysql://localhost:3306/{DB_PROJECT_NAME}?useSSL=false&useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Seoul&allowPublicKeyRetrieval=true&rewriteBatchedStatements=true` 로 로컬 MySQL 설정, 혹은 외부 RDB 서비스 엔드포인트 입력
@@ -188,7 +188,7 @@ src/main/resources/script/users-and-users-role-schema.sql 을 데이터베이스
    4. MySQL 접속 후 `src/main/resources/script/users-and-users-role-schema.sql` 을 복사 후 실행(시큐리티용 테이블 생성)
 
 2. 로컬에서 스프링부트 실행, MySQL, Redis 는 도커 컨테이너로 사용하는 경우(로컬 기본)
-   1. compose-dev.yaml 의 `mysql:` 이하를 전부 주석 해제 처리
+   1. compose-dev.yaml(개발), compose.yaml(배포) 의 `mysql:` 이하를 전부 주석 해제 처리
    2. `create-spring-app.env` 의 `2. 로컬에서 스프링 실행, 컨테이너로 DB를 사용하는 경우` 아래의 `DB_URL` 을 주석 해제, 나머지 `DB_URL`은 전부 주석 처리
    3. 스프링부트 실행(Intellij 실행 버튼) 후 mysql workbench 등에서 MySQL 컨테이너 접속(`localhost:3307`, `.env` 의 `DB_USERNAME`, `DB_PASSWORD`를 입력 후 접속)
    4. MySQL 접속 후 `src/main/resources/script/users-and-users-role-schema.sql` 을 복사 후 실행(시큐리티용 테이블 생성)
