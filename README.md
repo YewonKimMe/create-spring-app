@@ -2,8 +2,22 @@
 
 ### SpringBoot 기반 사이드 프로젝트용 시작 템플릿
 > 사이드 프로젝트 시 스프링부트 기반으로 빠르게 개발 환경을 셋팅 할 수 있는 템플릿입니다.
+---
+## 📦 주요 기술 스택
 
-## feature
+| 영역         | 사용 기술                     |
+|------------|---------------------------|
+| Language   | Java 17 (Toolchain 적용)    |
+| Build Tool | Gradle 8.x                |
+| Framework  | Spring Boot 3.5.3         |
+| ORM        | Spring Data JPA, QueryDSL |
+| DB         | MySQL                     |
+| Cache      | Redis                     |
+| Security   | Spring Security           |
+| Deployment / Infra | Docker, Docker Compose            |
+
+---
+## ✨feature
 
 - **Spring Security**
   - **인증 (Authentication)**
@@ -203,18 +217,6 @@ gradlew build, 컨테이너 실행 환경 구성
 > <br>create-spring-app-example.env 를 참고하세요.
 
 ---
-## 📦 주요 기술 스택
-
-| 영역         | 사용 기술                     |
-|------------|---------------------------|
-| Language   | Java 17 (Toolchain 적용)    |
-| Build Tool | Gradle 8.x                |
-| Framework  | Spring Boot 3.5.3         |
-| ORM        | Spring Data JPA, QueryDSL |
-| DB         | MySQL                     |
-| Cache      | Redis                     |
-| Security   | Spring Security           |
----
 
 ## 🛠️ 기본 구성
 
@@ -223,8 +225,12 @@ gradlew build, 컨테이너 실행 환경 구성
 ├── src/main/java
 │   └── com/github/YewonKimMe/...   # 기본 패키지 구조
 ├── src/main/resources
+|   └── script
+|       └── users-and-users-role-schema.sql # 시큐리티용 users, users_role
 │   ├── application.yml
-├──Dockerfile
+|   ├── application-dev.yml
+|   ├── application-prod.yml
+├── Dockerfile
 ├── compose.yml              # (Docker Compose 사용 시)
 ├── compose-dev.yml              # (Docker Compose 사용 시)
 ├── .env                    # docker compose 실행 환경변수 설정파일
