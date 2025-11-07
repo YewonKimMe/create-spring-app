@@ -1,9 +1,6 @@
 package com.github.YewonKimMe.create_spring_app.security.filter;
 
-import com.github.YewonKimMe.create_spring_app.security.enums.SecurityConst;
-import com.github.YewonKimMe.create_spring_app.security.enums.TokenDurationTime;
-import com.github.YewonKimMe.create_spring_app.security.enums.TokenType;
-import com.github.YewonKimMe.create_spring_app.security.enums.TokenValidationResult;
+import com.github.YewonKimMe.create_spring_app.security.enums.*;
 import com.github.YewonKimMe.create_spring_app.security.service.auth.Username;
 import com.github.YewonKimMe.create_spring_app.security.utils.TokenProvider;
 import jakarta.servlet.FilterChain;
@@ -21,6 +18,8 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
+import static com.github.YewonKimMe.create_spring_app.security.enums.UrlList.*;
+
 @Component
 @RequiredArgsConstructor
 public class JwtValidatorFilter extends OncePerRequestFilter {
@@ -35,9 +34,9 @@ public class JwtValidatorFilter extends OncePerRequestFilter {
 
     // JWT 검증을 건너뛸 경로 목록
     private static final List<String> EXCLUDE_URLS = Arrays.asList(
-             "/login",
-             "/api/v1/sign-up"
-              // 여기에 JWT 검증이 필요 없는 다른 공개 엔드포인트를 추가
+            LOGIN.getUrl(),
+            SIGNUP.getUrl()
+            // 여기에 JWT 검증이 필요 없는 다른 공개 엔드포인트를 추가
     );
 
     @Override
