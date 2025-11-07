@@ -65,16 +65,18 @@ IntelliJ에서 **실행(Run)** 버튼을 누르면 Spring Boot가 시작되며 �
 
 > Docker 컨테이너 대신 이미 설치된 로컬 MySQL이나 AWS RDS 같은 외부 서비스를 사용할 때 선택합니다.
 
-1.  `create-spring-app.env` 파일에서 `DB_URL`을 로컬 MySQL 데이터베이스 or 외부 RDB 서비스 엔드포인트로 변경합니다. `{DB_PROJECT_NAME}`을 자신의 데이터베이스 프로젝트명으로 변경하세요.
+1.  `create-spring-app.env` 파일에서 `DB_URL`을 로컬 MySQL 데이터베이스 or 외부 RDB 서비스 엔드포인트로 변경합니다. 로컬 MySQL의 경우`{DB_PROJECT_NAME}`을 자신의 데이터베이스 프로젝트명으로 변경하세요.
     ```properties
     DB_URL=jdbc:mysql://localhost:3306/{DB_PROJECT_NAME}?useSSL=false&useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Seoul&allowPublicKeyRetrieval=true&rewriteBatchedStatements=true
     ```
 2.  `compose-dev.yaml`(개발용) 및 `compose.yaml`(배포용)에서 `mysql:` 서비스 부분을 모두 **주석 처리**합니다.
-3.  외부 MySQL에 접속하여 데이터베이스를 생성하고, 초기화 스크립트(`users-and-users-role-schema.sql`)를 실행합니다.
+3. (배포 상황의 경우) `create-spring-app.env` 파일의 `REDIS_HOST` 를 `REDIS_HOST=redis`로 변경(컨테이너 서비스 이름)
+4. 스프링부트 실행 or 배포
+5. 외부 MySQL에 접속하여 데이터베이스를 생성하고, 초기화 스크립트(`users-and-users-role-schema.sql`)를 실행합니다.
 
 ### 시나리오 2: 로컬 Spring Boot + 컨테이너 DB (로컬 실행 기본값)
 
-> **가장 간편한 개발 방식으로, IDE 실행 시 컨테이너가 자동으로 뜹니다. (퀵스타트 기본 방식)**
+> **가장 간편한 개발 방식으로, IDE 실행 시 컨테이너가 자동으로 뜹니다. (퀵스타트 기본 방식, 처음 프로젝트 clone 시 변경사항 없음)**
 
 1.  `compose-dev.yaml`에서 `mysql:` 서비스가 **주석 해제**되어 있는지 확인합니다. (기본값)
 2.  `create-spring-app.env`에서 **'2. 로컬에서 스프링 실행...'** 주석 아래의 `DB_URL`을 사용합니다. (기본값)
@@ -92,9 +94,10 @@ IntelliJ에서 **실행(Run)** 버튼을 누르면 Spring Boot가 시작되며 �
 2.  `create-spring-app.env`에서 **컨테이너용 DB\_URL** 주석을 해제하고, 로컬용 URL은 주석 처리합니다.
     ```properties
     # 컨테이너 간 통신용 URL (서비스명 'mysql' 사용)
-    DB_URL=jdbc:mysql://mysql:3307/create_spring_app...
+    DB_URL=jdbc:mysql://mysql:3307/create-spring-app?useSSL=false&useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Seoul&allowPublicKeyRetrieval=true&rewriteBatchedStatements=true
     ```
-3.  `compose.yaml` 파일에서 다음 항목들의 **주석을 해제**합니다:
+3. `create-spring-app.env` 파일의 `REDIS_HOST` 를 `REDIS_HOST=redis`로 변경(컨테이너 서비스 이름)
+4. `compose.yaml` 파일에서 다음 항목들의 **주석을 해제**합니다:
     - `depends_on: - mysql` 라인
     - `# 컨테이너 DB 사용 시 아래 전부 주석 해제` 아래의 모든 `mysql` 관련 설정
 
@@ -102,7 +105,7 @@ IntelliJ에서 **실행(Run)** 버튼을 누르면 Spring Boot가 시작되며 �
 
 ## 🐳 배포 (Deployment)
 
-위 '시나리오 3' 설정을 마친 후, 운영 서버에서 다음 명령어로 전체 서비스를 실행합니다.
+위 '시나리오 3'(기본) 설정을 마친 후, 운영 서버에서 다음 명령어로 전체 서비스를 실행합니다.
 
 ```bash
 # 1. 프로젝트 빌드
