@@ -70,9 +70,10 @@ IntelliJ에서 **실행(Run)** 버튼을 누르면 Spring Boot가 시작되며 �
     DB_URL=jdbc:mysql://localhost:3306/{DB_PROJECT_NAME}?useSSL=false&useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Seoul&allowPublicKeyRetrieval=true&rewriteBatchedStatements=true
     ```
 2.  `compose-dev.yaml`(개발용) 및 `compose.yaml`(배포용)에서 `mysql:` 서비스 부분을 모두 **주석 처리**합니다.
-3. (배포 상황의 경우) `create-spring-app.env` 파일의 `REDIS_HOST` 를 `REDIS_HOST=redis`로 변경(컨테이너 서비스 이름)
-4. 스프링부트 실행 or 배포
-5. 외부 MySQL에 접속하여 데이터베이스를 생성하고, 초기화 스크립트(`users-and-users-role-schema.sql`)를 실행합니다.
+3. (배포 상황의 경우) `create-spring-app.env` 파일의 `REDIS_HOST` 를 `REDIS_HOST=redis`로 변경합니다. (컨테이너 서비스 이름)
+4. (배포 상황의 경우) `create-spring-app.env` 파일의 `SPRING_PROFILES_ACTIVE`를 `SPRING_PROFILES_ACTIVE=prod` 로 설정합니다.
+5. 스프링부트 실행 or 배포
+6. 외부 MySQL에 접속하여 데이터베이스를 생성하고, 초기화 스크립트(`users-and-users-role-schema.sql`)를 실행합니다.
 
 ### 시나리오 2: 로컬 Spring Boot + 컨테이너 DB (로컬 실행 기본값)
 
@@ -91,13 +92,14 @@ IntelliJ에서 **실행(Run)** 버튼을 누르면 Spring Boot가 시작되며 �
 > EC2 등 배포 서버에서 Spring Boot를 포함한 모든 스택을 Docker Compose로 실행할 때 사용합니다.
 
 1.  `.env` 파일 및 `create-spring-app.env` 파일의 DB 계정 정보(`DB_USERNAME`, `DB_PASSWORD` 등)를 동일하게 맞춥니다.
-2.  `create-spring-app.env`에서 **컨테이너용 DB\_URL** 주석을 해제하고, 로컬용 URL은 주석 처리합니다.
+2. `create-spring-app.env` 파일의 `SPRING_PROFILES_ACTIVE`를 `SPRING_PROFILES_ACTIVE=prod` 로 설정합니다.
+3. `create-spring-app.env`에서 **컨테이너용 DB\_URL** 주석을 해제하고, 로컬용 URL은 주석 처리합니다.
     ```properties
     # 컨테이너 간 통신용 URL (서비스명 'mysql' 사용)
     DB_URL=jdbc:mysql://mysql:3307/create-spring-app?useSSL=false&useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Seoul&allowPublicKeyRetrieval=true&rewriteBatchedStatements=true
     ```
-3. `create-spring-app.env` 파일의 `REDIS_HOST` 를 `REDIS_HOST=redis`로 변경(컨테이너 서비스 이름)
-4. `compose.yaml` 파일에서 다음 항목들의 **주석을 해제**합니다:
+4. `create-spring-app.env` 파일의 `REDIS_HOST` 를 `REDIS_HOST=redis`로 변경(컨테이너 서비스 이름)
+5. `compose.yaml` 파일에서 다음 항목들의 **주석을 해제**합니다:
     - `depends_on: - mysql` 라인
     - `# 컨테이너 DB 사용 시 아래 전부 주석 해제` 아래의 모든 `mysql` 관련 설정
 
@@ -124,6 +126,21 @@ docker-compose -f compose.yaml up -d --build
 - **🛠 Utils**: XSS 방지, AES 암호화, 편리한 쿠키 관리
 ---
 
+### 🔄 인증 방식에 따른 응답 (USE_SESSION)
+`create-spring-app.env` 파일의 `USE_SESSION` 설정(`true`,`false`)에 따라 인증 성공 시 서버의 응답 방식이 달라집니다. **두 방식 모두 성공 시 응답 본문(Response Body)은 없습니다.**
+
+* **1. `USE_SESSION=true` (세션 기반 인증)**
+    * 로그인 성공 시 `200 OK`를 반환합니다.
+    * 응답 헤더의 `Set-Cookie`를 통해 `HttpOnly` 속성의 `JSESSIONID` 쿠키가 발급됩니다.
+    * 클라이언트는 이후 요청 시 이 쿠키를 자동으로 전송하며, 별도의 토큰 관리가 필요 없습니다.
+
+* **2. `USE_SESSION=false` (JWT 토큰 기반 인증)**
+    * 로그인 성공 시 `200 OK`를 반환합니다.
+    * 응답 헤더(Header)의 `Authorization` 필드에 `'Bearer <Access Token>'` 형태로 JWT가 포함되어 반환됩니다.
+    * 클라이언트는 이 헤더에서 토큰을 추출하여 저장한 후, 이후 모든 인증이 필요한 API 요청 시 `Authorization` 헤더에 동일하게 담아 전송해야 합니다.
+
+---
+
 ### 🔓 인증 예외 URL (Permitted URLs)
 다음 엔드포인트들은 인증 없이 접근 가능하도록 기본 설정되어 있습니다.
 
@@ -142,6 +159,8 @@ docker-compose -f compose.yaml up -d --build
 > ```
 
 > 💡 추가적인 인증 예외 설정은 `SecurityConfig` 클래스의 `filterChain` 메서드 내부 `requestMatchers(...).permitAll()` 부분에서 수정할 수 있습니다.
+
+---
 
 ### 🔒 인증 필요 URL (Authenticated URL Pattern)
 | Method | URI                  | 설명                                 |
