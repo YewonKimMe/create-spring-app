@@ -222,19 +222,29 @@ gradlew build, 컨테이너 실행 환경 구성
 
 ```bash
 .
-├── src/main/java
-│   └── com/github/YewonKimMe/...   # 기본 패키지 구조
-├── src/main/resources
-|   └── script
-|       └── users-and-users-role-schema.sql # 시큐리티용 users, users_role
-│   ├── application.yml
-|   ├── application-dev.yml
-|   ├── application-prod.yml
+├── src
+│   ├── main
+│   │   ├── java
+│   │   │   └── com
+│   │   │       └── github
+│   │   │           └── YewonKimMe
+│   │   │               └── ...                # 기본 패키지 구조
+│   │   └── resources
+│   │       ├── script
+│   │       │   └── users-and-users-role-schema.sql   # 시큐리티용 users, users_role 스키마
+│   │       ├── application.yml
+│   │       ├── application-dev.yml
+│   │       └── application-prod.yml
+│   └── test
+│       └── java
+│           └── ...                            # 테스트 코드
 ├── Dockerfile
-├── compose.yml              # (Docker Compose 사용 시)
-├── compose-dev.yml              # (Docker Compose 사용 시)
-├── .env                    # docker compose 실행 환경변수 설정파일
-├── create-spring-app.env # 환경변수 파일, 직접 생성 또는 create-spring-app-example.env 파일명 변경 후 value 추가 필요  
+├── compose.yml                                # Docker Compose (운영용)
+├── compose-dev.yml                            # Docker Compose (개발용)
+├── .env                                       # docker compose 실행 환경변수
+├── create-spring-app.env                      # 환경변수 파일 (직접 생성 or example 복사)
+├── create-spring-app-example.env              # 예시 env 파일
 ├── build.gradle
 ├── LICENSE
 └── README.md
+
