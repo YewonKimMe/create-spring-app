@@ -1,9 +1,6 @@
 spring:
   application:
     name: create-spring-app
-  docker:
-    compose:
-      enabled: true
   config:
     import: optional:file:create-spring-app.env[.properties]
   profiles:
