@@ -43,7 +43,7 @@ application.properties
 /src/main/resources/firebase/
 
 # 환경 변수 파일 무시
-.env
+
 create-spring-app.env
 
 ### QueryDSL generated QEntity files ###
