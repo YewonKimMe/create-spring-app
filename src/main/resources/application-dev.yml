@@ -1,16 +1,20 @@
-# 로컬 개발 테스트용 yml
-# 로컬 머신 데이터베이스 접속 용도
+# Docker Compose 개발용 yml
+# 모든 서비스를 컨테이너로 실행
 
 spring:
   application:
-    name: create-spring-app
+    name: ${PROJECT_NAME}
+  docker:
+    compose:
+      enabled: true
+      file: compose-dev.yaml
   jackson:
     time-zone: Asia/Seoul
   # DATASOURCE SETTING
   datasource:
-    url: jdbc:mysql://localhost:3306/create-spring-app?useSSL=false&useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Seoul&allowPublicKeyRetrieval=true&rewriteBatchedStatements=true
-    username:
-    password:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
   # REDIS SETTING
   data:
@@ -26,16 +30,16 @@ spring:
   security:
     cors:
       client:
-        dev-cors-allowed-url: http://localhost:3000 # 클라이언트 개발 서버 허용 URL
-        prod-cors-allowed-url: your-service-url # 프로덕션 개발 서버 허용 URL
+        dev-cors-allowed-url: ${DEV_CORS_ALLOWED_URL} # 클라이언트 개발 서버 허용 URL
+        prod-cors-allowed-url: ${PROD_CORS_ALLOWED_URL} # 프로덕션 개발 서버 허용 URL
     auth:
-      use-session: false
+      use-session: ${USE_SESSION}
       jwt:
-        secret: K9u1rZ5tQ8sB0xV7w3JcP2eR4yH6nL8aG5dF1mT9zW0xU7sQ3vE6pA2rN4tY8kL # JWT SECRET, 예시(변경 필요)
+        secret: ${JWT_SECRET} # JWT SECRET
 
 # AES KEY
 aes:
-  aes-key: Yv3sF9qA1nK7wL4eZ8pR2xC6tB0jM5uD # AES KEY 예시
+  aes-key: ${AES_KEY}
 
 # LOGGING LEVEL
 logging:
