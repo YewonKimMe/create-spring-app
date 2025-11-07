@@ -3,6 +3,7 @@ package com.github.YewonKimMe.create_spring_app.security.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.YewonKimMe.create_spring_app.security.enums.Role;
 import com.github.YewonKimMe.create_spring_app.security.enums.SecurityConst;
+import com.github.YewonKimMe.create_spring_app.security.enums.UrlList;
 import com.github.YewonKimMe.create_spring_app.security.exception.entrypoint.AuthenticationEntrypoint;
 import com.github.YewonKimMe.create_spring_app.security.filter.JsonUsernamePasswordAuthenticationFilter;
 import com.github.YewonKimMe.create_spring_app.security.filter.JwtValidatorFilter;
@@ -29,6 +30,8 @@ import org.springframework.web.cors.CorsConfiguration;
 
 import java.util.Collections;
 import java.util.List;
+
+import static com.github.YewonKimMe.create_spring_app.security.enums.UrlList.*;
 
 @RequiredArgsConstructor
 @Configuration
@@ -82,7 +85,7 @@ public class SecurityConfig {
                 )
                 .logout(logout ->
                         logout
-                                .logoutUrl("/logout")
+                                .logoutUrl(LOGOUT.getUrl())
                                 .addLogoutHandler(logoutHandler)
                                 .logoutSuccessHandler(((request, response, authentication) -> {
                                     // 로그아웃 성공 후 처리
@@ -115,11 +118,11 @@ public class SecurityConfig {
                 // 엔드포인트에 맞게 변경하면 됩니다.
                 .authorizeHttpRequests(
                         request -> request
-                                .requestMatchers(HttpMethod.POST, "/login").permitAll()
-                                .requestMatchers("/api/v1/sign-up").permitAll()
+                                .requestMatchers(HttpMethod.POST, LOGIN.getUrl()).permitAll()
+                                .requestMatchers(HttpMethod.POST, SIGNUP.getUrl()).permitAll()
                                 // 역할 기반 인가 예시
-                                .requestMatchers("/api/v1/admin/**").hasRole(Role.ADMIN.getRole())
-                                .requestMatchers("/api/v1/user/**").hasRole(Role.USER.getRole())
+                                .requestMatchers(ADMIN_PATTERN.getUrl()).hasRole(Role.ADMIN.getRole())
+                                .requestMatchers(USER_API_PATTERN.getUrl()).hasRole(Role.USER.getRole())
 
                                 // ...
                                 .anyRequest().authenticated() // 외의 모든 요청은 인증 필요

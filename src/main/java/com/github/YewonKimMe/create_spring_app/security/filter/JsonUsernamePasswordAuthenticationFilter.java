@@ -14,13 +14,15 @@ import org.springframework.security.web.authentication.AbstractAuthenticationPro
 
 import java.io.IOException;
 
+import static com.github.YewonKimMe.create_spring_app.security.enums.UrlList.*;
+
 public class JsonUsernamePasswordAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
 
     private final ObjectMapper objectMapper;
 
     public JsonUsernamePasswordAuthenticationFilter(ObjectMapper objectMapper) {
         super(
-                request -> "/login".equals(request.getRequestURI())
+                request -> LOGIN.getUrl().equals(request.getRequestURI())
                 && HttpMethod.POST.name().equals(request.getMethod())
         );
         this.objectMapper = objectMapper;
