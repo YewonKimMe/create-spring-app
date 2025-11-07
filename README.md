@@ -157,6 +157,36 @@ git push -u origin main
 
 ---
 
+# SpringSecurity 관련 DB 테이블 설정
+src/main/resources/script/users-and-users-role-schema.sql 을 데이터베이스 프로젝트에서 실행
+
+---
+# 데이터베이스 설정
+사용 환경에 따라 아래 단계를 따라하면 됩니다.
+
+로컬 개발: 로컬 스프링부트 + 로컬 MySQL + 로컬 Redis 를 기준으로 합니다.
+배포: Docker Compose + 외부 RDB 서비스 or MySQL 컨테이너를 기준으로 합니다.
+
+1. 로컬, 혹은 배포용 인스턴스에서 외부 RDB 서비스나 인스턴스(로컬) MySQL 등을 사용하는 경우
+   1. 환경변수 파일 `create-spring-app-example.env`의 `DB_URL=jdbc:mysql://localhost:3306/{DB_PROJECT_NAME}?useSSL=false&useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Seoul&allowPublicKeyRetrieval=true&rewriteBatchedStatements=true` 로 로컬 MySQL 설정, 혹은 외부 RDB 서비스 엔드포인트 입력
+   2. compose-dev.yaml 의 `mysql:` 이하를 전부 주석 처리
+   3. `create-spring-app` 데이터베이스를 MySQL 내에 생성
+   4. MySQL 접속 후 `src/main/resources/script/users-and-users-role-schema.sql` 을 복사 후 실행(시큐리티용 테이블 생성)
+2. 로컬에서 스프링부트 실행, RDB는 도커 컨테이너로 사용하는 경우
+   1. compose-dev.yaml 의 `mysql:` 이하를 전부 주석 해제 처리
+   2. `create-spring-app.env` 의 `2. 로컬에서 스프링 실행, 컨테이너로 DB를 사용하는 경우` 아래의 `DB_URL` 을 주석 해제, 나머지 `DB_URL`은 전부 주석 처리
+   3. 스프링부트 실행(Intellij 실행 버튼) 후 mysql workbench 등에서 MySQL 컨테이너 접속(`localhost:3307`, `.env` 의 `DB_USERNAME`, `DB_PASSWORD`를 입력 후 접속)
+   4. MySQL 접속 후 `src/main/resources/script/users-and-users-role-schema.sql` 을 복사 후 실행(시큐리티용 테이블 생성)
+3. 배포용 인스턴스에서 한 인스턴스 내에 Mysql 도커 컨테이너를 띄워서 사용하는 경우(로컬/외부서비스 사용 X)
+- 이 경우 Springboot, MySQL, Redis 모두 컨테이너로 동작
+   1. `.env` 파일의 `MYSQL_ROOT_PASSWORD`, `DB_USERNAME`, `DB_PASSWORD` 세팅
+   2. `create-spring-app-example.env` 의 `DB_USERNAME`, `DB_PASSWORD` 을 `.env`와 동일하게 세팅
+   3. `create-spring-app-example.env` 의 로컬용 `DB_URL` 을 주석 처리(17번 라인), 컨테이너용 `DB_URL` 주석 해제(24번 라인)
+   4. `compose.yaml` 의 `depends_on: - mysql` 라인 주석 해제 
+   5. `compose.yaml` 의 `# 컨테이너 DB 사용 시 아래 전부 주석 해제` 아래를 전부 주석 해제
+
+
+---
 
 # docker-compose 기반 배포
 
@@ -195,8 +225,7 @@ gradlew build, 컨테이너 실행 환경 구성
 ├── src/main/resources
 │   ├── application.yml
 ├──Dockerfile
-├── docker-compose.yml              # (Docker Compose 사용 시)
-├── compose-dev.yml   # 개발용 도커 설정
+├── compose.yml              # (Docker Compose 사용 시)
 ├── create-spring-app.env # 환경변수 파일, 직접 생성 또는 create-spring-app-example.env 파일명 변경 후 value 추가 필요  
 ├── build.gradle
 └── README.md
