@@ -226,6 +226,8 @@ gradlew build, 컨테이너 실행 환경 구성
 │   ├── application.yml
 ├──Dockerfile
 ├── compose.yml              # (Docker Compose 사용 시)
+├── compose-dev.yml              # (Docker Compose 사용 시)
+├── .env                    # docker compose 실행 환경변수 설정파일
 ├── create-spring-app.env # 환경변수 파일, 직접 생성 또는 create-spring-app-example.env 파일명 변경 후 value 추가 필요  
 ├── build.gradle
 └── README.md
