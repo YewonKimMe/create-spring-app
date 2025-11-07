@@ -3,7 +3,6 @@ package com.github.YewonKimMe.create_spring_app.security.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.YewonKimMe.create_spring_app.security.enums.Role;
 import com.github.YewonKimMe.create_spring_app.security.enums.SecurityConst;
-import com.github.YewonKimMe.create_spring_app.security.enums.UrlList;
 import com.github.YewonKimMe.create_spring_app.security.exception.entrypoint.AuthenticationEntrypoint;
 import com.github.YewonKimMe.create_spring_app.security.filter.JsonUsernamePasswordAuthenticationFilter;
 import com.github.YewonKimMe.create_spring_app.security.filter.JwtValidatorFilter;
