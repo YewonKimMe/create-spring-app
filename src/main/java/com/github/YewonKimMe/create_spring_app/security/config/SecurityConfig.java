@@ -3,7 +3,6 @@ package com.github.YewonKimMe.create_spring_app.security.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.YewonKimMe.create_spring_app.security.enums.Role;
 import com.github.YewonKimMe.create_spring_app.security.enums.SecurityConst;
-import com.github.YewonKimMe.create_spring_app.security.enums.UrlList;
 import com.github.YewonKimMe.create_spring_app.security.exception.entrypoint.AuthenticationEntrypoint;
 import com.github.YewonKimMe.create_spring_app.security.filter.JsonUsernamePasswordAuthenticationFilter;
 import com.github.YewonKimMe.create_spring_app.security.filter.JwtValidatorFilter;
@@ -69,7 +68,16 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(useSession() ? config -> {} : AbstractHttpConfigurer::disable) // CSRF 비활성화 (Header 기반 JWT)
+                .csrf(csrf -> {
+                    if (useSession()) {
+                        csrf.ignoringRequestMatchers(
+                                request -> request.getRequestURI().equals(LOGIN.getUrl()),
+                                request -> request.getRequestURI().equals(SIGNUP.getUrl())
+                        );
+                    } else {
+                        csrf.disable();
+                    }
+                })
                 .formLogin(AbstractHttpConfigurer::disable) // formLogin 비활성화
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .securityContext(configurer -> configurer
