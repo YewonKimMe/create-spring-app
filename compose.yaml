@@ -1,5 +1,6 @@
 services:
-  spring-app:
+  spring-app: # 배포 시에만 사용
+    platform: linux/arm64
     build:
       context: .
       dockerfile: Dockerfile
@@ -7,12 +8,48 @@ services:
     ports:
       - "8080:8080"
     env_file:
-      - create-spring-app.env # 최상위 디렉토리에 생성해 주세요.
+      - create-spring-app.env
     depends_on:
-      - redis
+      redis:
+        condition: service_healthy
+      mysql:
+        condition: service_healthy
     environment:
       - TZ=Asia/Seoul
+
   redis:
     image: 'redis:latest'
+    container_name: create-spring-app-redis
     ports:
-      - '6379'
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+# 컨테이너 DB 배포 시
+  mysql:
+    image: mysql:8.4
+    container_name: create-spring-app-mysql
+    healthcheck:
+      # 배포용이므로 가장 확실한 쿼리 테스트 사용
+      test: ["CMD-SHELL", "mysql -h 127.0.0.1 -u$$DB_USERNAME -p$$DB_PASSWORD -e 'select 1'"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=create-spring-app
+      - MYSQL_USER=${DB_USERNAME}
+      - MYSQL_PASSWORD=${DB_PASSWORD}
+      - TZ=Asia/Seoul
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+
+volumes:
+  mysql_data:
