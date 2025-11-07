@@ -1,3 +1,5 @@
+USE `create-spring-app`;
+
 CREATE TABLE users
 (
     id              BIGINT       NOT NULL,
