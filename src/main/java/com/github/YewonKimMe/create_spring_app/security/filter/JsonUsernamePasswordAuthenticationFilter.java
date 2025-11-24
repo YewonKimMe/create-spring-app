@@ -2,6 +2,7 @@ package com.github.YewonKimMe.create_spring_app.security.filter;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.YewonKimMe.create_spring_app.security.config.AuthProperties;
 import com.github.YewonKimMe.create_spring_app.security.dto.LoginRequest;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,18 +15,19 @@ import org.springframework.security.web.authentication.AbstractAuthenticationPro
 
 import java.io.IOException;
 
-import static com.github.YewonKimMe.create_spring_app.security.enums.UrlList.*;
-
 public class JsonUsernamePasswordAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
 
     private final ObjectMapper objectMapper;
 
-    public JsonUsernamePasswordAuthenticationFilter(ObjectMapper objectMapper) {
-        super(
-                request -> LOGIN.getUrl().equals(request.getRequestURI())
-                && HttpMethod.POST.name().equals(request.getMethod())
+    private final AuthProperties authProperties;
+
+    public JsonUsernamePasswordAuthenticationFilter(ObjectMapper objectMapper, AuthProperties authProperties) {
+        super(request ->
+                HttpMethod.POST.matches(request.getMethod()) &&
+                        request.getRequestURI().equals(authProperties.getLoginUrl())
         );
         this.objectMapper = objectMapper;
+        this.authProperties = authProperties;
     }
 
     @Override

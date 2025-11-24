@@ -1,231 +1,186 @@
 # 🌱 create-spring-app
 
-### SpringBoot 기반 사이드 프로젝트용 시작 템플릿
-> 사이드 프로젝트 시 스프링부트 기반으로 빠르게 개발 환경을 셋팅 할 수 있는 템플릿입니다.
+### Spring Boot 사이드 프로젝트 퀵스타트 템플릿
 
-## feature
+> 스프링부트 기반 사이드 프로젝트를 위한 보일러플레이트<br>
+> 스프링시큐리티 기반 인증, 보안, DB, Docker 환경이 미리 구성되어 있어 비즈니스 로직 개발에 바로 집중할 수 있습니다.
 
-- **Spring Security**
-  - **인증 (Authentication)**
-    - **JWT / 세션 기반 인증**: `application-dev.yml`, `application-prod.yml` 파일의 `auth.use-session` boolean 설정을 통해 JWT 방식과 세션 방식 중 선택하여 사용할 수 있습니다.
-    - **JSON 기반 로그인**: `JsonUsernamePasswordAuthenticationFilter`를 통해 Form Data가 아닌 JSON 형식의 Request Body로 로그인을 처리합니다.
-      - 로그인 요청 엔드포인트: `/login`
-      - 계정 등록 엔드포인트는 구현이 필요합니다. `SecurityConfig`에는 `/api/v1/sign-up`으로 설정되어 있습니다.
-    - **Redis 토큰 관리**: JWT 사용 시, Refresh Token을 Redis에 저장하여 관리합니다.
-    - **커스텀 핸들러**: 인증 성공/실패, 로그아웃 등 다양한 시나리오에 대한 커스텀 핸들러를 구현했습니다.
-    - **User**: 기본적인 `User` 클래스 및 `Authority` 클래스가 정의되어 있습니다.
-      - 인증 과정에서 `SecurityUserDetails`는 위 `User` 를 사용합니다.
+-----
 
-- **데이터베이스 (Database)**
-  - **QueryDSL 지원**: `QueryDslConfig`를 통해 QueryDSL을 프로젝트에 통합하여 타입-세이프(type-safe)한 동적 쿼리 작성이 가능합니다.
-  - **Snowflake ID 생성**: Snowflake 알고리즘을 사용, 유니크하고 정렬 가능한 ID를 생성합니다. 엔티티의 ID에 `@SnowflakeGenerated` 어노테이션을 사용하여 적용할 수 있습니다.
+## 📦 Tech Stack
 
-- **유틸리티 (Utilities)**
-  - **XSS 방지**: `XssSanitizer`를 통해 Cross-Site Scripting 공격을 방지합니다.
-  - **AES 암호화**: `AESUtil`을 통해 데이터를 대칭키 방식으로 암호화하고 복호화할 수 있습니다.
-  - **쿠키 관리**: `CookieUtils`를 통해 쿠키를 손쉽게 생성, 조회, 삭제할 수 있습니다.
+| Category | Technology | Description |
+| :--- | :--- | :--- |
+| **Language** | Java 17 | Toolchain 적용 |
+| **Framework** | Spring Boot 3.5.3 | |
+| **Build Tool** | Gradle 8.x | |
+| **Security** | Spring Security | JWT / Session 하이브리드 지원 |
+| **Database** | MySQL | |
+| **ORM** | Spring Data JPA, QueryDSL | 타입 세이프한 동적 쿼리 지원 |
+| **Cache** | Redis | Refresh Token 및 캐싱 데이터 관리 |
+| **Infra** | Docker, Docker Compose | 개발 및 배포 환경 컨테이너화 |
 
-- **개발 환경 (Development Environment)**
-  - **프로필 기반 설정**: `dev`, `prod` 등 환경에 따라 설정을 분리하여 관리합니다. (`application-dev.yml`, `application-prod.yml`)
-  - **Docker Compose 지원**: `compose-dev.yaml` 파일을 통해 `mysql`, `redis` 등 개발에 필요한 의존성들을 컨테이너로 한번에 실행할 수 있습니다.
+-----
 
----
+## 🛠 퀵스타트: 내 프로젝트로 만들기
 
-## 🛠 템플릿 프로젝트 → 내 프로젝트로 완전히 리네이밍하기
+### 1\. 프로젝트 가져오기
 
-이 가이드는 `create-spring-app` 템플릿을 기반으로
-내 프로젝트를 `my-cool-project`로 이름, 패키지, 설정을 전부 바꾸는 방법을 안내합니다.
-
----
-
-### ✅ 0단계. 준비
-
-GitHub 템플릿에서 내 프로젝트 생성:
+GitHub 리포지토리 우측 상단의 **[Use this template]** 버튼을 클릭하거나, 아래 명령어로 클론합니다.
 
 ```bash
 git clone https://github.com/YewonKimMe/create-spring-app.git my-cool-project
 cd my-cool-project
 ```
 
-또는 create-spring-app 리포지토리 우측 상단 'Use This template' -> create new repository 후,
-자신의 repository 에서 git clone
+### 2\. 프로젝트 리네이밍 (필수)
 
----
+| 단계 | 수정 파일/경로 | 내용 |
+| :-- | :--- | :--- |
+| **1. 프로젝트명** | `settings.gradle` | `rootProject.name = 'my-cool-project'` |
+| **2. 그룹명** | `build.gradle` | `group = 'com.myname'` |
+| **3. 패키지 경로** | `src/main/java/...` | `com.github.YewonKimMe...` → `com.myname.mycoolproject`<br>*(IDE Refactor 기능 권장)* |
+| **4. 테스트 경로** | `src/test/java/...` | 메인 패키지와 동일하게 변경 |
+| **5. 앱 이름** | `src/main/resources/application.yml` | `spring.application.name: my-cool-project` |
 
-### ✅ 1단계. 프로젝트 이름 변경
-
-`settings.gradle` 열고, 아래 줄을 수정하세요:
-
-```groovy
-rootProject.name = 'my-cool-project'
-```
-
----
-
-### ✅ 2단계. 그룹명 변경
-
-`build.gradle` 파일에서 이 부분을 수정하세요:
-
-```groovy
-group = 'com.myname'
-```
-
-원하는 그룹명 (도메인 기반 네이밍)을 넣으세요. 예: `dev.yewon`, `io.github.junho`
-
----
-
-### ✅ 3단계. 패키지 경로 바꾸기
-
-현재 패키지 경로는 다음과 같을 수 있습니다:
-
-```
-src/main/java/com/github/YewonKimMe/create_spring_app
-```
-
-이 경로를 다음과 같이 바꿔주세요:
-
-```
-src/main/java/com/myname/mycoolproject
-```
-
-> IntelliJ에서: 해당 폴더 우클릭 → `Refactor` → `Rename` & `Move` 순서대로 사용하면 안전하게 변경됩니다.
-
-변경 후에는 `.java` 파일 상단의 `package` 선언도 이렇게 바뀌어야 합니다:
-
-```java
-// 변경 전
-package com.github.YewonKimMe.create_spring_app;
-
-// 변경 후
-package com.myname.mycoolproject;
-```
-
----
-
-### ✅ 4단계. 테스트 코드 경로도 동일하게 변경
-
-```
-src/test/java/com/github/YewonKimMe/create_spring_app
-→
-src/test/java/com/myname/mycoolproject
-```
-
-테스트 클래스 내부의 `package` 선언도 꼭 함께 변경해주세요.
-
----
-
-### ✅ 5단계. 애플리케이션 이름 변경
-
-`src/main/resources/application.yml` 파일 열고, 아래 항목을 수정하세요:
-
-```yaml
-spring:
-  application:
-    name: my-cool-project
-```
-
----
-
-### ✅ 6단계. README 수정
-
-`README.md` 파일을 열고, 다음 내용을 내 프로젝트에 맞게 바꾸세요:
-
-* 프로젝트 이름 (`create-spring-app` → `my-cool-project`)
-* 설명, 기술스택, 실행 방법 등 필요에 따라 업데이트
-
----
-
-### ✅ 7단계. Git 원격 저장소 연결
-
-새로운 GitHub 저장소를 만든 후, 기존 원격을 바꾸세요:
+### 3\. 환경변수 파일 생성
 
 ```bash
-git remote set-url origin https://github.com/your-username/my-cool-project.git
+cp create-spring-app-example.env create-spring-app.env
 ```
 
-최초 푸시:
+### 4\. 실행 (기본 로컬 모드)
+
+IntelliJ에서 **실행(Run)** 버튼을 누르면 Spring Boot가 시작되며 필요한 DB 컨테이너(MySQL, Redis)도 자동으로 실행됩니다.
+
+> 💡 최초 실행 후, `localhost:3307` DB에 접속하여 `src/main/resources/script/users-and-users-role-schema.sql` 스크립트를 반드시 실행해주세요.
+
+-----
+
+## 🗄️ 상세 데이터베이스 설정 가이드
+
+사용 환경에 따라 아래 3가지 시나리오 중 하나를 선택하여 설정하세요.
+
+### 시나리오 1: 외부 MySQL 사용 (로컬 설치형 또는 클라우드 DB)
+
+> Docker 컨테이너 대신 이미 설치된 로컬 MySQL이나 AWS RDS 같은 외부 서비스를 사용할 때 선택합니다.
+
+1.  `create-spring-app.env` 파일에서 `DB_URL`을 로컬 MySQL 데이터베이스 or 외부 RDB 서비스 엔드포인트로 변경합니다. 로컬 MySQL의 경우`{DB_PROJECT_NAME}`을 자신의 데이터베이스 프로젝트명으로 변경하세요.
+    ```properties
+    DB_URL=jdbc:mysql://localhost:3306/{DB_PROJECT_NAME}?useSSL=false&useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Seoul&allowPublicKeyRetrieval=true&rewriteBatchedStatements=true
+    ```
+2.  `compose-dev.yaml`(개발용) 및 `compose.yaml`(배포용)에서 `mysql:` 서비스 부분을 모두 **주석 처리**합니다.
+3. (배포 상황의 경우) `create-spring-app.env` 파일의 `REDIS_HOST` 를 `REDIS_HOST=redis`로 변경합니다. (컨테이너 서비스 이름)
+4. (배포 상황의 경우) `create-spring-app.env` 파일의 `SPRING_PROFILES_ACTIVE`를 `SPRING_PROFILES_ACTIVE=prod` 로 설정합니다.
+5. 스프링부트 실행 or 배포
+6. 외부 MySQL에 접속하여 데이터베이스를 생성하고, 초기화 스크립트(`users-and-users-role-schema.sql`)를 실행합니다.
+
+### 시나리오 2: 로컬 Spring Boot + 컨테이너 DB (로컬 실행 기본값)
+
+> **가장 간편한 개발 방식으로, IDE 실행 시 컨테이너가 자동으로 뜹니다. (퀵스타트 기본 방식, 처음 프로젝트 clone 시 변경사항 없음)**
+
+1.  `compose-dev.yaml`에서 `mysql:` 서비스가 **주석 해제**되어 있는지 확인합니다. (기본값)
+2.  `create-spring-app.env`에서 **'2. 로컬에서 스프링 실행...'** 주석 아래의 `DB_URL`을 사용합니다. (기본값)
+    ```properties
+    # 로컬 컨테이너 접속용 URL (포트 3307)
+    DB_URL=jdbc:mysql://localhost:3307/create-spring-app?useSSL=false&useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Seoul&allowPublicKeyRetrieval=true&rewriteBatchedStatements=true
+    ```
+3.  앱 실행 후, `localhost:3307`에 접속(정보는 `.env` 참조)하여 초기화 스크립트를 실행합니다.
+
+### 시나리오 3: 전체 컨테이너 배포 (배포 환경 기본값)
+
+> EC2 등 배포 서버에서 Spring Boot를 포함한 모든 스택을 Docker Compose로 실행할 때 사용합니다.
+
+1.  `.env` 파일 및 `create-spring-app.env` 파일의 DB 계정 정보(`DB_USERNAME`, `DB_PASSWORD` 등)를 동일하게 맞춥니다.
+2. `create-spring-app.env` 파일의 `SPRING_PROFILES_ACTIVE`를 `SPRING_PROFILES_ACTIVE=prod` 로 설정합니다.
+3. `create-spring-app.env`에서 **컨테이너용 DB\_URL** 주석을 해제하고, 로컬용 URL은 주석 처리합니다.
+    ```properties
+    # 컨테이너 간 통신용 URL (서비스명 'mysql' 사용)
+    DB_URL=jdbc:mysql://mysql:3307/create-spring-app?useSSL=false&useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Seoul&allowPublicKeyRetrieval=true&rewriteBatchedStatements=true
+    ```
+4. `create-spring-app.env` 파일의 `REDIS_HOST` 를 `REDIS_HOST=redis`로 변경(컨테이너 서비스 이름)
+5. `compose.yaml` 파일에서 다음 항목들의 **주석을 해제**합니다:
+    - `depends_on: - mysql` 라인
+    - `# 컨테이너 DB 사용 시 아래 전부 주석 해제` 아래의 모든 `mysql` 관련 설정
+
+-----
+
+## 🐳 배포 (Deployment)
+
+위 '시나리오 3'(기본) 설정을 마친 후, 운영 서버에서 다음 명령어로 전체 서비스를 실행합니다.
 
 ```bash
-git add .
-git commit -m "chore: initialize my-cool-project from spring template"
-git push -u origin main
+# 1. 프로젝트 빌드
+./gradlew clean build
+
+# 2. 전체 스택 실행
+docker-compose -f compose.yaml up -d --build
 ```
 
+-----
+
+## ✨ Key Features
+
+- **🔐 Spring Security**: JWT/Session 하이브리드 인증, JSON 로그인 처리
+- **💾 Data**: QueryDSL, Snowflake ID 지원
+- **🛠 Utils**: XSS 방지, AES 암호화, 편리한 쿠키 관리
 ---
 
-## 🎉 이제 내 프로젝트로 완전히 리네이밍이 완료되었습니다. 바로 개발을 시작하세요! 🚀
+### 🔄 인증 방식에 따른 응답 (USE_SESSION)
+`create-spring-app.env` 파일의 `USE_SESSION` 설정(`true`,`false`)에 따라 인증 성공 시 서버의 응답 방식이 달라집니다. **두 방식 모두 성공 시 응답 본문(Response Body)은 없습니다.**
 
----
+* **1. `USE_SESSION=true` (세션 기반 인증)**
+    * 로그인 성공 시 `200 OK`를 반환합니다.
+    * 응답 헤더의 `Set-Cookie`를 통해 `HttpOnly` 속성의 `JSESSIONID` 쿠키가 발급됩니다.
+    * 클라이언트는 이후 요청 시 이 쿠키를 자동으로 전송하며, 별도의 토큰 관리가 필요 없습니다.
 
-# SpringSecurity 관련 DB 테이블 설정
-src/main/resources/script/users-and-users-role-schema.sql 을 데이터베이스 프로젝트에서 실행
-
----
-# 데이터베이스 설정
-사용 환경에 따라 아래 단계를 따라하면 됩니다.
-
-로컬 개발: 로컬 스프링부트 + 로컬 MySQL + 로컬 Redis 를 기준으로 합니다.
-배포: Docker Compose + 외부 RDB 서비스 or MySQL 컨테이너를 기준으로 합니다.
-
-1. 로컬, 혹은 배포용 인스턴스에서 외부 RDB 서비스나 인스턴스(로컬) MySQL 등을 사용하는 경우
-   1. 환경변수 파일 `create-spring-app-example.env`의 `DB_URL=jdbc:mysql://localhost:3306/{DB_PROJECT_NAME}?useSSL=false&useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Seoul&allowPublicKeyRetrieval=true&rewriteBatchedStatements=true` 로 로컬 MySQL 설정, 혹은 외부 RDB 서비스 엔드포인트 입력
-   2. compose-dev.yaml 의 `mysql:` 이하를 전부 주석 처리
-   3. `create-spring-app` 데이터베이스를 MySQL 내에 생성
-   4. MySQL 접속 후 `src/main/resources/script/users-and-users-role-schema.sql` 을 복사 후 실행(시큐리티용 테이블 생성)
-2. 로컬에서 스프링부트 실행, RDB는 도커 컨테이너로 사용하는 경우
-   1. compose-dev.yaml 의 `mysql:` 이하를 전부 주석 해제 처리
-   2. `create-spring-app.env` 의 `2. 로컬에서 스프링 실행, 컨테이너로 DB를 사용하는 경우` 아래의 `DB_URL` 을 주석 해제, 나머지 `DB_URL`은 전부 주석 처리
-   3. 스프링부트 실행(Intellij 실행 버튼) 후 mysql workbench 등에서 MySQL 컨테이너 접속(`localhost:3307`, `.env` 의 `DB_USERNAME`, `DB_PASSWORD`를 입력 후 접속)
-   4. MySQL 접속 후 `src/main/resources/script/users-and-users-role-schema.sql` 을 복사 후 실행(시큐리티용 테이블 생성)
-3. 배포용 인스턴스에서 한 인스턴스 내에 Mysql 도커 컨테이너를 띄워서 사용하는 경우(로컬/외부서비스 사용 X)
-- 이 경우 Springboot, MySQL, Redis 모두 컨테이너로 동작
-   1. `.env` 파일의 `MYSQL_ROOT_PASSWORD`, `DB_USERNAME`, `DB_PASSWORD` 세팅
-   2. `create-spring-app-example.env` 의 `DB_USERNAME`, `DB_PASSWORD` 을 `.env`와 동일하게 세팅
-   3. `create-spring-app-example.env` 의 로컬용 `DB_URL` 을 주석 처리(17번 라인), 컨테이너용 `DB_URL` 주석 해제(24번 라인)
-   4. `compose.yaml` 의 `depends_on: - mysql` 라인 주석 해제 
-   5. `compose.yaml` 의 `# 컨테이너 DB 사용 시 아래 전부 주석 해제` 아래를 전부 주석 해제
-
+* **2. `USE_SESSION=false` (JWT 토큰 기반 인증)**
+    * 로그인 성공 시 `200 OK`를 반환합니다.
+    * 응답 헤더(Header)의 `Authorization` 필드에 `'Bearer <Access Token>'` 형태로 JWT가 포함되어 반환됩니다.
+    * 클라이언트는 이 헤더에서 토큰을 추출하여 저장한 후, 이후 모든 인증이 필요한 API 요청 시 `Authorization` 헤더에 동일하게 담아 전송해야 합니다.
 
 ---
 
-# docker-compose 기반 배포
+### 🔓 인증 예외 URL (Permitted URLs)
+다음 엔드포인트들은 인증 없이 접근 가능하도록 기본 설정되어 있습니다.
 
-gradlew build, 컨테이너 실행 환경 구성
+| Method | URI | 설명                 |
+| :--- | :--- |:-------------------|
+| `POST` | **`/api/v1/login`** | 로그인 요청 (JSON Body) |
+| `POST` | **`/api/v1/sign-up`** | 회원가입 요청(별도 구현 필요)  |
 
-1. 인스턴스에 프로젝트 가져오기: `git clone your-project-name`
-2. JAR 파일 만들기: 프로젝트 root 디렉토리에서, `./gradlew clean build
-`
-3. root 디렉토리에 `create-spring-app.env` 파일 생성 (또는 첨부된 create-spring-app-example.env 파일 제목 변경 후 내용 작성)
-4. 프로젝트 루트 디렉토리에서 `docker compose up -d --build` 명령 실행 
-    - (Dockerfile이 JAR 배포파일을 docker image 안으로 복사)
+> **📌 로그인 요청 예시 (JSON Body)**
+>
+> ```json
+> {
+>     "username" : "admin",
+>     "password": "password1234"
+> }
+> ```
 
-> docker-compose 기반 배포 시 root 디렉토리에 `create-spring-app.env` 파일 추가가 필요합니다.
-> <br>create-spring-app-example.env 를 참고하세요.
+> 💡 추가적인 인증 예외 설정은 `SecurityConfig` 클래스의 `filterChain` 메서드 내부 `requestMatchers(...).permitAll()` 부분에서 수정할 수 있습니다.
 
 ---
-## 📦 주요 기술 스택
 
-| 영역         | 사용 기술                     |
-|------------|---------------------------|
-| Language   | Java 17 (Toolchain 적용)    |
-| Build Tool | Gradle 8.x                |
-| Framework  | Spring Boot 3.5.3         |
-| ORM        | Spring Data JPA, QueryDSL |
-| DB         | MySQL                     |
-| Cache      | Redis                     |
-| Security   | Spring Security           |
----
+### 🔒 인증 필요 URL (Authenticated URL Pattern)
+| Method | URI                  | 설명                                 |
+|:-------|:---------------------|:-----------------------------------|
+| `ALL`  | **`/api/v1/user/**`**  | 인증된 유저 전용 URL 패턴(`ROLE_USER` 필요)   |
+| `ALL`  | **`/api/v1/admin/**`** | 인증된 관리자 전용 URL 패턴(`ROLE_ADMIN` 필요) |
 
-## 🛠️ 기본 구성
+-----
+
+## 📂 프로젝트 구조
 
 ```bash
 .
-├── src/main/java
-│   └── com/github/YewonKimMe/...   # 기본 패키지 구조
-├── src/main/resources
-│   ├── application.yml
-├──Dockerfile
-├── compose.yml              # (Docker Compose 사용 시)
-├── create-spring-app.env # 환경변수 파일, 직접 생성 또는 create-spring-app-example.env 파일명 변경 후 value 추가 필요  
-├── build.gradle
-└── README.md
+├── src/main/resources/
+│   ├── script/                     # DB 스키마 초기화 SQL
+│   ├── application.yml             # 공통 설정
+│   └── application-dev.yml         # 개발 프로필 설정
+├── compose-dev.yaml                # 개발용 인프라 (Spring Boot 자동 실행)
+├── compose.yaml                    # 배포용 전체 인프라
+├── Dockerfile                      # 배포용 이미지 빌드 설정
+├── .env                            # Docker Compose 환경변수
+└── create-spring-app.env           # Spring Boot 애플리케이션 환경변수
+```
