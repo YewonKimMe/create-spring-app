@@ -13,7 +13,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -29,8 +28,6 @@ import org.springframework.web.cors.CorsConfiguration;
 
 import java.util.Collections;
 import java.util.List;
-
-import static com.github.YewonKimMe.create_spring_app.security.enums.UrlList.*;
 
 @RequiredArgsConstructor
 @Configuration
@@ -70,9 +67,9 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> {
                     if (useSession()) {
+                        List<String> postUrls = authProperties.getPermitUrls();
                         csrf.ignoringRequestMatchers(
-                                request -> request.getRequestURI().equals(LOGIN.getUrl()),
-                                request -> request.getRequestURI().equals(SIGNUP.getUrl())
+                                request -> postUrls.contains(request.getRequestURI())
                         );
                     } else {
                         csrf.disable();
@@ -93,7 +90,7 @@ public class SecurityConfig {
                 )
                 .logout(logout ->
                         logout
-                                .logoutUrl(LOGOUT.getUrl())
+                                .logoutUrl(authProperties.getLogoutUrl())
                                 .addLogoutHandler(logoutHandler)
                                 .logoutSuccessHandler(((request, response, authentication) -> {
                                     // 로그아웃 성공 후 처리
@@ -126,11 +123,10 @@ public class SecurityConfig {
                 // 엔드포인트에 맞게 변경하면 됩니다.
                 .authorizeHttpRequests(
                         request -> request
-                                .requestMatchers(HttpMethod.POST, LOGIN.getUrl()).permitAll()
-                                .requestMatchers(HttpMethod.POST, SIGNUP.getUrl()).permitAll()
+                                .requestMatchers(authProperties.getPermitUrls().toArray(String[]::new)).permitAll()
                                 // 역할 기반 인가 예시
-                                .requestMatchers(ADMIN_PATTERN.getUrl()).hasRole(Role.ADMIN.getRole())
-                                .requestMatchers(USER_API_PATTERN.getUrl()).hasRole(Role.USER.getRole())
+                                .requestMatchers(authProperties.getAdminUrlPattern()).hasRole(Role.ADMIN.getRole())
+                                .requestMatchers(authProperties.getUserUrlPattern()).hasRole(Role.USER.getRole())
 
                                 // ...
                                 .anyRequest().authenticated() // 외의 모든 요청은 인증 필요
@@ -168,7 +164,7 @@ public class SecurityConfig {
 
     @Bean
     public JsonUsernamePasswordAuthenticationFilter authenticationFilter() throws Exception {
-        JsonUsernamePasswordAuthenticationFilter filter = new JsonUsernamePasswordAuthenticationFilter(new ObjectMapper());
+        JsonUsernamePasswordAuthenticationFilter filter = new JsonUsernamePasswordAuthenticationFilter(new ObjectMapper(), authProperties);
         filter.setAuthenticationManager(authenticationManager()); // AuthenticationManager 주입
         filter.setAuthenticationFailureHandler(customAuthenticationFailureHandler); // failureHandler 주입
         filter.setAuthenticationSuccessHandler(customAuthenticationSuccessHandler); // successHandler 주입

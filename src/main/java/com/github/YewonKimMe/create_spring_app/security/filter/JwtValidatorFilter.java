@@ -1,7 +1,9 @@
 package com.github.YewonKimMe.create_spring_app.security.filter;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.YewonKimMe.create_spring_app.security.config.AuthProperties;
 import com.github.YewonKimMe.create_spring_app.security.enums.*;
-import com.github.YewonKimMe.create_spring_app.security.service.auth.Username;
+import com.github.YewonKimMe.create_spring_app.security.exception.dto.SecurityErrorResponse;
 import com.github.YewonKimMe.create_spring_app.security.utils.TokenProvider;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -15,14 +17,11 @@ import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-
-import static com.github.YewonKimMe.create_spring_app.security.enums.UrlList.*;
-
 @Component
 @RequiredArgsConstructor
 public class JwtValidatorFilter extends OncePerRequestFilter {
+
+    private final AuthProperties authProperties;
 
     /**
      * Token Validator Filter
@@ -31,13 +30,6 @@ public class JwtValidatorFilter extends OncePerRequestFilter {
      * */
 
     private final TokenProvider tokenProvider;
-
-    // JWT 검증을 건너뛸 경로 목록
-    private static final List<String> EXCLUDE_URLS = Arrays.asList(
-            LOGIN.getUrl(),
-            SIGNUP.getUrl()
-            // 여기에 JWT 검증이 필요 없는 다른 공개 엔드포인트를 추가
-    );
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -59,37 +51,16 @@ public class JwtValidatorFilter extends OncePerRequestFilter {
                 return;
             }
             case EXPIRED: {
-                // refresh token check
-                String rawUsername = tokenProvider.getUsername(token);
-                Username username = new Username(rawUsername);
-
-                String redisKey = username.generateKey(TokenType.REFRESH);
-
-                String refreshToken = tokenProvider.getRefreshToken(redisKey);
-
-                if (refreshToken == null || refreshToken.isBlank()) {
-                    cleanContextAndContinue(request, response, filterChain);
-                    return;
-                }
-
-                TokenValidationResult refTokenValidationResult = tokenProvider.validateRefreshToken(refreshToken);
-
-                if (refTokenValidationResult == TokenValidationResult.VALID) {
-
-                    Authentication authentication = tokenProvider.getAuthentication(refreshToken);
-
-                    String newAccessToken = tokenProvider.generateToken(authentication, TokenType.ACCESS, TokenDurationTime.REFRESH.getHour());
-
-                    String bearer = SecurityConst.BEARER_PREFIX.getValue() + newAccessToken;
-
-                    response.setHeader(SecurityConst.AUTH_HEADER.getValue(), bearer);
-
-                    SecurityContextHolder.getContext().setAuthentication(authentication);
-                } else {
-                    cleanContextAndContinue(request, response, filterChain);
-                    return;
-                }
-                filterChain.doFilter(request, response);
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.setContentType("application/json");
+                SecurityErrorResponse errorResponse = new SecurityErrorResponse(
+                        HttpServletResponse.SC_UNAUTHORIZED,
+                        "Unauthorized",
+                        "TOKEN_EXPIRED",
+                        request.getServletPath()
+                );
+                ObjectMapper mapper = new ObjectMapper();
+                response.getWriter().write(mapper.writeValueAsString(errorResponse));
                 return;
             }
             default: {
@@ -109,8 +80,9 @@ public class JwtValidatorFilter extends OncePerRequestFilter {
 
         AntPathMatcher pathMatcher = new AntPathMatcher();
 
-        return EXCLUDE_URLS.stream().anyMatch(pattern -> pathMatcher.match(pattern, servletPath))
-        || !pathMatcher.match("/api/v1/**", servletPath);
+        // JWT 검증을 건너뛸 경로 목록
+        return authProperties.getPermitUrls().stream().anyMatch(pattern -> pathMatcher.match(pattern, servletPath))
+        || !pathMatcher.match(authProperties.getBaseUrl() + "/**", servletPath);
 
     }
 }

@@ -32,6 +32,15 @@ spring:
       use-session: ${USE_SESSION}
       jwt:
         secret: ${JWT_SECRET} # JWT SECRET
+      permit-urls:
+        - /api/v1/auth/sign-up
+        - /api/v1/auth/login
+        - /api/v1/auth/refresh
+      base-url: /api/v1
+      login-url: /api/v1/auth/login
+      logout-url: /api/v1/auth/logout
+      admin-url-pattern: /api/v1/admin/**
+      user-url-pattern: /api/v1/user/**
 
 # AES KEY
 aes:
