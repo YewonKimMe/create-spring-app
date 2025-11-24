@@ -1,6 +1,8 @@
 package com.github.YewonKimMe.create_spring_app.security.filter;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.YewonKimMe.create_spring_app.security.enums.*;
+import com.github.YewonKimMe.create_spring_app.security.exception.dto.SecurityErrorResponse;
 import com.github.YewonKimMe.create_spring_app.security.service.auth.Username;
 import com.github.YewonKimMe.create_spring_app.security.utils.TokenProvider;
 import jakarta.servlet.FilterChain;
@@ -59,37 +61,16 @@ public class JwtValidatorFilter extends OncePerRequestFilter {
                 return;
             }
             case EXPIRED: {
-                // refresh token check
-                String rawUsername = tokenProvider.getUsername(token);
-                Username username = new Username(rawUsername);
-
-                String redisKey = username.generateKey(TokenType.REFRESH);
-
-                String refreshToken = tokenProvider.getRefreshToken(redisKey);
-
-                if (refreshToken == null || refreshToken.isBlank()) {
-                    cleanContextAndContinue(request, response, filterChain);
-                    return;
-                }
-
-                TokenValidationResult refTokenValidationResult = tokenProvider.validateRefreshToken(refreshToken);
-
-                if (refTokenValidationResult == TokenValidationResult.VALID) {
-
-                    Authentication authentication = tokenProvider.getAuthentication(refreshToken);
-
-                    String newAccessToken = tokenProvider.generateToken(authentication, TokenType.ACCESS, TokenDurationTime.REFRESH.getHour());
-
-                    String bearer = SecurityConst.BEARER_PREFIX.getValue() + newAccessToken;
-
-                    response.setHeader(SecurityConst.AUTH_HEADER.getValue(), bearer);
-
-                    SecurityContextHolder.getContext().setAuthentication(authentication);
-                } else {
-                    cleanContextAndContinue(request, response, filterChain);
-                    return;
-                }
-                filterChain.doFilter(request, response);
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.setContentType("application/json");
+                SecurityErrorResponse errorResponse = new SecurityErrorResponse(
+                        HttpServletResponse.SC_UNAUTHORIZED,
+                        "Unauthorized",
+                        "TOKEN_EXPIRED",
+                        request.getServletPath()
+                );
+                ObjectMapper mapper = new ObjectMapper();
+                response.getWriter().write(mapper.writeValueAsString(errorResponse));
                 return;
             }
             default: {
